@@ -1,0 +1,41 @@
+# This file contains current database schema for the Wurrd:ClientAuthorization plugin.
+# Do not change anything in this file unless you know what you are doing!
+
+# Contains information about devices. .
+wca_device:
+    fields:
+        # Internal ID for this device.
+        deviceid: "int NOT NULL auto_increment PRIMARY KEY"
+        # The device's unique identifier. 
+        deviceuuid: "varchar(1024) NOT NULL"
+        # Platform, whether Android, iOS, Windows
+        platform: "varchar(64)"
+        # Phone, tablet
+        type: "varchar(64)"
+        # Device name, as given by the manufacturer
+        name: "varchar(256)"
+        
+# Contains information about client authorizations
+wca_authorization:
+    fields:
+        authid: "int NOT NULL auto_increment PRIMARY KEY"
+        # Operator associated with this authorization. Foreign key for {operator}.operatorid
+        operatorid: "int NOT NULL"
+        # Device id. This field is foreign key for {device}.deviceid
+        deviceid: "int NOT NULL"
+        # ID of the client application that requested the authorization
+        clientid: "varchar(256)"
+        # access token
+        accesstoken: "varchar(256) NOT NULL"
+        # Unix timestamp of the moment when the access token was created.
+        dtmaccesscreated: "int NOT NULL"
+        # duration in seconds for the access token.
+        accessduration: "int NOT NULL"
+        # access token
+        refreshtoken: "varchar(256) NOT NULL"
+        # Unix timestamp of the moment when the refresh token was created.
+        dtmrefreshcreated: "int NOT NULL"
+        # duration in seconds for the refresh token.
+        refreshduration: "int NOT NULL"
+        # TODO: How do we capture scope?
+

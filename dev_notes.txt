@@ -1,0 +1,6 @@
+
+1	EN 1/31/2015	
+	When using $request->getContents(), we get the following warning in the PHP log.
+	We have to ensure that this gets resolved before hitting the field.
+	Automatically populating $HTTP_RAW_POST_DATA is deprecated and will be removed in a future version
+

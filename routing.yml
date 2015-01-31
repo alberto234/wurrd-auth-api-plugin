@@ -1,0 +1,14 @@
+# Custom routes to handle authorization requests
+wurrd_client_auth_login:
+    # Relative path from the Mibew web root is used here.
+    path: /wurrd/client/login/{client_id}/{username}/{password}
+    # Set some defaults for the request
+    defaults:
+        # This value is special. It tells the system what action should be
+        # invoked for the response
+        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\LoginController::loginAction
+
+wurrd_client_auth_request_access:
+    path: /wurrd/client/requestaccess
+    defaults:
+        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::requestAccessAction

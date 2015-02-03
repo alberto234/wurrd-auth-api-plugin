@@ -32,8 +32,16 @@ class Constants
      * The version of the plugin
      */
     public static  $WCA_VERSION = '0.1.0';
-
-
+	
+	// Constants for keys used to request access
+	public static $CLIENTID_KEY 	= 'clientid';
+	public static $USERNAME_KEY 	= 'username';
+	public static $PASSWORD_KEY 	= 'password';
+	public static $DEVICEUUID_KEY 	= 'deviceuuid';
+	public static $PLATFORM_KEY 	= 'platform';
+	public static $TYPE_KEY 		= 'type';
+	public static $DEVICENAME_KEY 	= 'devicename';
+	
     /**
      * This class should not be instantiated
      */

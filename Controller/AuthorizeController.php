@@ -22,6 +22,9 @@ namespace Wurrd\Mibew\Plugin\ClientAuthorization\Controller;
 use Mibew\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
+use Wurrd\Mibew\Plugin\ClientAuthorization\Classes\AuthorizationUtil;
+
  
  /**
  * Controller used for authorization.
@@ -38,11 +41,24 @@ class AuthorizeController extends AbstractController
     //public function loginAction($client_id, $username, $password, Request $request)
     public function requestAccessAction(Request $request)
 	{
-		// Return the JSON request
-		$response = new Response($request->getContent()."\r\n");
-		$response->headers->set('Content-Type', 'application/json');		
+		$response = new Response();
+		$response->headers->set('Content-Type', 'application/json');
+		
+		$authRequest = json_decode($request->getContent(), true);
+        $json_error_code = json_last_error();
+        if ($json_error_code != JSON_ERROR_NONE) {
+            // Not valid JSON
+			$response->setContent(array(
+            	'message' => "The access request package have invalid json structure. JSON error code is '" . 
+            				  $json_error_code . "'"));
+			$response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        }
+		
+		$authResponse = AuthorizationUtil::requestAccess($authRequest);
+		
+		$response->setContent(json_encode($authResponse));
+		
 		return $response;
     }
 }
 
- 

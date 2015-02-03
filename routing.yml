@@ -12,3 +12,4 @@ wurrd_client_auth_request_access:
     path: /wurrd/client/requestaccess
     defaults:
         _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::requestAccessAction
+    methods: [POST]

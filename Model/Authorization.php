@@ -24,7 +24,7 @@ use Mibew\Database;
 
 
 /**
- * A class that represents Device entity.
+ * A class that represents an Authorization entity.
  */
 class Authorization
 {
@@ -163,6 +163,32 @@ class Authorization
     }
 
     /**
+     * Create a new authorization
+     *
+     */
+    public static function createNewAuhtorization($accessToken, $accessDuration, $refreshToken, $refreshDuration,
+    	$operatorid, $deviceid, $clientid, $createdTime)
+    {
+    	$db_fields = array('authid' => false,
+    					   'operatorid' => (int)$operatorid,
+    					   'deviceid' => (int)$deviceid,
+    					   'clientid' => $clientid,
+    					   'accesstoken' => $accessToken,
+    					   'dtmaccesscreated' => $createdTime,
+    					   'accessduration' => (int)$accessDuration,
+    					   'refreshtoken' => $refreshToken,
+    					   'dtmrefreshcreated' => $createdTime,
+    					   'refreshduration' => (int)$refreshDuration
+    				);
+
+        // Create and populate authorization object
+        $authorization = new self();
+        $authorization->populateFromDbFields($db_fields);
+
+        return $authorization;
+    }
+
+    /**
      * Class constructor.
      */
     public function __construct()
@@ -245,7 +271,7 @@ class Authorization
     protected function populateFromDbFields($db_fields)
     {
         $this->id = $db_fields['authid'];
-        $this->operatorid = $db_fields['opertorid'];
+        $this->operatorid = $db_fields['operatorid'];
         $this->deviceid = $db_fields['deviceid'];
         $this->clientid = $db_fields['clientid'];
         $this->accesstoken = $db_fields['accesstoken'];

@@ -4,3 +4,10 @@
 	We have to ensure that this gets resolved before hitting the field.
 	Automatically populating $HTTP_RAW_POST_DATA is deprecated and will be removed in a future version
 
+
+TEST DATA
+
+curl --header Content-Type:"application/json" http://localhost/mibew-2b2/index.php/wurrd/client/requestaccess -d "{\"username\":\"admin\", \"password\":\"mibew01\", \"clientid\":\"aabbbcccddeee\", \"deviceuuid\":\"aaa-uuu-ii\", \"type\":\"phone\", \"devicename\":\"iPhone 5s\", \"platform\":\"iOS\"}"
+
+
+YWRtaW4AJDJ5JDA4JDZHQWo4TGRMZE9SMVdJY0NHYy5Ua3VrbWRqLmE5V2x6aXZWQmdVUUVYRlpYWm5LWjJaUVVt

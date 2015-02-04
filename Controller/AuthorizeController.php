@@ -23,7 +23,7 @@ use Mibew\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
-use Wurrd\Mibew\Plugin\ClientAuthorization\Classes\AuthorizationUtil;
+use Wurrd\Mibew\Plugin\ClientAuthorization\Classes\AccessManagerAPI;
 
  
  /**
@@ -54,9 +54,13 @@ class AuthorizeController extends AbstractController
 			$response->setStatusCode(Response::HTTP_BAD_REQUEST);
         }
 		
-		$authResponse = AuthorizationUtil::requestAccess($authRequest);
+		$authorization = AccessManagerAPI::requestAccess($authRequest);
 		
-		$response->setContent(json_encode($authResponse));
+		$response->setContent(json_encode(array(
+						'accesstoken' => $authorization->accesstoken,
+						'accessduration' => $authorization->accessduration,
+						'refreshtoken' => $authorization->refreshtoken,
+						'refreshduration' => $authorization->refreshduration)));
 		
 		return $response;
     }

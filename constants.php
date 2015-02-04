@@ -42,6 +42,10 @@ class Constants
 	public static $TYPE_KEY 		= 'type';
 	public static $DEVICENAME_KEY 	= 'devicename';
 	
+	// Defaults for authorization
+	public static $ACCESS_DURATION	 	= 3600;			// One hour
+	public static $REFRESH_DURATION 	= 604800;		// One week
+	
     /**
      * This class should not be instantiated
      */

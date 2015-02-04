@@ -31,7 +31,7 @@ wca_authorization:
         dtmaccesscreated: "int NOT NULL"
         # duration in seconds for the access token.
         accessduration: "int NOT NULL"
-        # access token
+        # refresh token
         refreshtoken: "varchar(256) NOT NULL"
         # Unix timestamp of the moment when the refresh token was created.
         dtmrefreshcreated: "int NOT NULL"

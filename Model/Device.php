@@ -112,7 +112,7 @@ class Device
         // Load device info
         $device_info = Database::getInstance()->query(
             "SELECT * FROM {wca_device} WHERE deviceuuid = :uuid and platform = :platform",
-            array(':uuuid' => $uuid,
+            array(':uuid' => $uuid,
 				  ':platform' => $platform),
             array('return_rows' => Database::RETURN_ONE_ROW)
         );
@@ -140,7 +140,7 @@ class Device
      */
     public static function createDevice($uuid, $platform, $type, $name)
     {
-        // Check $id
+        // Check parameters
         if (empty($uuid) || empty($platform) || empty($type) || empty($name)) {
             return false;
         }
@@ -237,8 +237,9 @@ class Device
             $this->id = $db->insertedId();
 
         } else {
-        	// Question: Does an update make sense for a device?
+        	// Question: Does an update make sense for a device? Probably not
  
+ 			/*
             // Update existing device
             $db->query(
                 ("UPDATE {wca_device} SET deviceuuid = :uuid, platform = :platform, "
@@ -250,6 +251,7 @@ class Device
                     ':name' => $this->name
                 )
             );
+			*/
         }
     }
 

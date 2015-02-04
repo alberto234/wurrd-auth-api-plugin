@@ -21,11 +21,12 @@ namespace Wurrd\Mibew\Plugin\ClientAuthorization\Classes;
 
 use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Model\Device;
+use Wurrd\Mibew\Plugin\ClientAuthorization\Model\Authorization;
 
 /**
- * Utility class to handle the authorizations
+ * Interface to manage access to Mibew
  */
-class AuthorizationUtil
+class AccessManagerAPI
 {
 	/**
 	 * This method is used to generate an access token
@@ -33,10 +34,11 @@ class AuthorizationUtil
 	 * 					    access token to be generated. The arguments are
 	 * 						defined in constants.php are.
 	 * 
-	 * @return array of token parameters
+	 * @return Authorization - An instance of Authorization or false if a failure
 	 */
 	 public static function requestAccess($args) {
-	 	// TODO: Learn and use the template function pattern to validate the parameters
+	 	// TODO: 1 - Learn and use the template function pattern to validate the parameters
+	 	//		 2 - Implement a proper exception handling framework.
 	 	
 	 	/* Steps:
 		 * 1 - Get the operator and confirm access to the system
@@ -52,6 +54,7 @@ class AuthorizationUtil
         $platform = $args[Constants::$PLATFORM_KEY];
         $type = $args[Constants::$TYPE_KEY];
         $devicename = $args[Constants::$DEVICENAME_KEY];
+		$clientID = $args[Constants::$CLIENTID_KEY];
 
         $operator = operator_by_login($login);
         $operator_can_login = $operator
@@ -60,6 +63,8 @@ class AuthorizationUtil
             && !operator_is_disabled($operator);
 
 
+		$device;
+		$authorization;
 		if ($operator_can_login) {
 			 // Step 2 - Get/create the device
 			 $newDevice = false;
@@ -69,26 +74,63 @@ class AuthorizationUtil
 			 	$device = Device::createDevice($deviceuuid, $platform, $type, $devicename);
 				$newDevice = true;
 			 }
-			 
-			 if (!$device) {
+
+			 if ($device !== false) {
 			 	// Step 3 - Create tokens
+			 	$authorization = AccessManagerAPI::createAuthorization($operator, $device, $clientID);
+				if ($authorization !== false) {
+					//$authorization->save();
+				}
 			 }
 		}
-		
-		$message = null;
-        if ($operator_can_login) {
-        	$message = 'Successfully logged in';
-		} else {
-			$message = 'Failed to log in';
+
+		if (!is_null($authorization) && $authorization !== false) {
+			/*$authTokens = array('accesstoken' => $authorization->accesstoken,
+								 'accessduration' => $authorization->accessduration,
+								 'refreshtoken' => $authorization->refreshtoken,
+								 'refreshduration' => $authorization->refreshduration);	*/
+								 
+			// If we get here, persist the device and authorization
+			$device->save();
+			$authorization->deviceid = $device->id;
+			$authorization->save();
+			
+			// var_dump($authorization);
+			
+			// TODO: Ensure that everything is persisted before we return the tokens
+			return $authorization;
 		}
 		
-		$authTokens = array('message' => $message . " in AuthorizationUtil");
-		
-		return $authTokens;		
-	 	
+		return false;
 	 }
 	 
-	 
+	/**
+	 * This method is used to create a new authorization record
+	 * @param array $operator - The operator associated with the access token
+	 * @param Device $device - The device associated with the access token
+	 * @param string $clientID - The client ID of the app
+	 * 
+	 * @return Authorization - An Authorization instance. 
+	 */
+	 private static function createAuthorization($operator, $device, $clientID) {
+	 	$currTime = time();
+		
+		// Create access token: sha256 of operator login + time
+		$tmp = hash("sha256", $operator['login'] . $currTime, true);
+		$tmp .= "\x0" . Constants::$ACCESS_DURATION;
+		$accesstoken = strtr(base64_encode($tmp), '+/=', '-_,');
+		
+		// Create refresh token: sha256 of deviceuuid + time
+		$tmp = hash("sha256", $device->deviceuuid . $currTime, true);
+		$tmp .= "\x0" . Constants::$REFRESH_DURATION;
+		$refreshtoken = strtr(base64_encode($tmp), '+/=', '-_,');
+		
+		$authorization = Authorization::createNewAuhtorization($accesstoken, Constants::$ACCESS_DURATION,
+							$refreshtoken, Constants::$REFRESH_DURATION, $operator['operatorid'], 
+							$device->id, $clientID, $currTime);
+							
+		return $authorization;
+	 }
 	     
     /**
      * This class should not be instantiated

@@ -31,7 +31,8 @@ class Constants
 	/**
      * The version of the plugin
      */
-    public static  $WCA_VERSION = '0.1.0';
+    public static  $WCA_VERSION 	= '0.1.0';
+    public static  $TOKEN_VERSION 	= '1';
 	
 	// Constants for keys used to request access
 	public static $CLIENTID_KEY 	= 'clientid';

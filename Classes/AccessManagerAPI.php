@@ -116,13 +116,13 @@ class AccessManagerAPI
 	 	$currTime = time();
 		
 		// Create access token: sha256 of operator login + time
-		$tmp = hash("sha256", $operator['login'] . $currTime, true);
-		$tmp .= "\x0" . Constants::$ACCESS_DURATION;
+		$tmp = Constants::$TOKEN_VERSION . "\x0" . Constants::$ACCESS_DURATION . "\x0";
+		$tmp .= hash("sha256", $operator['login'] . $currTime, true);
 		$accesstoken = strtr(base64_encode($tmp), '+/=', '-_,');
 		
 		// Create refresh token: sha256 of deviceuuid + time
-		$tmp = hash("sha256", $device->deviceuuid . $currTime, true);
-		$tmp .= "\x0" . Constants::$REFRESH_DURATION;
+		$tmp = Constants::$TOKEN_VERSION . "\x0" . Constants::$REFRESH_DURATION . "\x0";
+		$tmp .= hash("sha256", $device->deviceuuid . $currTime, true);
 		$refreshtoken = strtr(base64_encode($tmp), '+/=', '-_,');
 		
 		$authorization = Authorization::createNewAuhtorization($accesstoken, Constants::$ACCESS_DURATION,

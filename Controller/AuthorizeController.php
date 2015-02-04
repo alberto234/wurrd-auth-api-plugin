@@ -59,8 +59,11 @@ class AuthorizeController extends AbstractController
 		$response->setContent(json_encode(array(
 						'accesstoken' => $authorization->accesstoken,
 						'accessduration' => $authorization->accessduration,
+						'accesscreatedtime' => $authorization->dtmaccesscreated,
 						'refreshtoken' => $authorization->refreshtoken,
-						'refreshduration' => $authorization->refreshduration)));
+						'refreshduration' => $authorization->refreshduration,
+						'refreshcreatedtime' => $authorization->dtmrefreshcreated,
+						)));
 		
 		return $response;
     }

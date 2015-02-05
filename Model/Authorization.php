@@ -25,6 +25,10 @@ use Mibew\Database;
 
 /**
  * A class that represents an Authorization entity.
+ * 
+ * Note: This class contains methods for persistence. Ideally persistence should be 
+ * 		 moved to a persistence manager such that users of this class wouldn't be 
+ * 		 able to inadvertently change its state in persistence.
  */
 class Authorization
 {
@@ -131,6 +135,33 @@ class Authorization
     }
 
     /**
+     * Returns an array of authorizations for a given device.
+     *
+     * @param int	$deviceID 	ID of the device to query
+     * @return array	Returns an array of Authorizations.
+     */
+    public static function allByDevice($deviceID) {
+    	$authorizations = array();
+		
+        $rows = Database::getInstance()->query(
+            "SELECT * FROM {wca_authorization} WHERE deviceid = :deviceid",
+            array(':deviceid' => (int)$deviceID),
+            array('return_rows' => Database::RETURN_ALL_ROWS)
+        );
+
+        if ($rows === false) {
+            return $authorizations;
+        }
+
+        foreach ($rows as $item) {
+            $auth = new self();
+            $auth->populateFromDbFields($item);
+            $authorizations[] = $auth;
+        }
+
+        return $authorizations;
+	}
+    /**
      * Loads authorization by access token.
      *
      * @param string $accessToken The access token.
@@ -151,7 +182,7 @@ class Authorization
         );
 
         // There is no matching authorization in database
-        if (!auth_info) {
+        if (!$auth_info) {
             return false;
         }
 

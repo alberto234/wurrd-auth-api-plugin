@@ -25,6 +25,10 @@ use Mibew\Database;
 
 /**
  * A class that represents Device entity.
+ * 
+ * Note: This class contains methods for persistence. Ideally persistence should be 
+ * 		 moved to a persistence manager such that users of this class wouldn't be 
+ * 		 able to inadvertently change its state in persistence.
  */
 class Device
 {

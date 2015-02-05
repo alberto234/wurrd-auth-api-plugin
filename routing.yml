@@ -13,3 +13,17 @@ wurrd_client_auth_request_access:
     defaults:
         _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::requestAccessAction
     methods: [POST]
+
+# This route should only be available for testing purposes. The intention is that access will be verified by
+# other plugins using the AccessManager API
+wurrd_client_auth_authorized:
+    path: /wurrd/client/authorized/{accesstoken}
+    defaults:
+        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::authorizedAction
+    methods: [GET]
+
+wurrd_client_auth_test_inheritance:
+    path: /wurrd/client/test_inheritance
+    defaults:
+        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::testInheritanceAction
+

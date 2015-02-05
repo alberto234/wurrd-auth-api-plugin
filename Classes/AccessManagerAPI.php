@@ -19,17 +19,21 @@
 
 namespace Wurrd\Mibew\Plugin\ClientAuthorization\Classes;
 
+use Mibew\Http\Exception;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Model\Device;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Model\Authorization;
 
 /**
- * Interface to manage access to Mibew
+ * Interface to manage access to Mibew from devices such as 
+ * mobile apps or third-party webapps
  */
 class AccessManagerAPI
 {
 	/**
-	 * This method is used to generate an access token
+	 * This method is used to generate grant access to a device/client. 
+	 * This call causes previous access to be revoked.
+	 * 
 	 * @param array $args - An array containing the arguments needed for the
 	 * 					    access token to be generated. The arguments are
 	 * 						defined in constants.php are.
@@ -39,13 +43,6 @@ class AccessManagerAPI
 	 public static function requestAccess($args) {
 	 	// TODO: 1 - Learn and use the template function pattern to validate the parameters
 	 	//		 2 - Implement a proper exception handling framework.
-	 	
-	 	/* Steps:
-		 * 1 - Get the operator and confirm access to the system
-		 * 2 - Get/create the device
-		 * 3 - Create tokens
-		 * 4 - Return tokens
-	 	*/
 	 	
 	 	// Step 1 - Get the operator and confirm access to the system
         $login = $args[Constants::$USERNAME_KEY];
@@ -63,7 +60,6 @@ class AccessManagerAPI
             && !operator_is_disabled($operator);
 
 
-		$device;
 		$authorization;
 		if ($operator_can_login) {
 			 // Step 2 - Get/create the device
@@ -72,31 +68,21 @@ class AccessManagerAPI
 			 if (!$device) {
 			 	// The device is not found, add a new device
 			 	$device = Device::createDevice($deviceuuid, $platform, $type, $devicename);
+				$device->save();
 				$newDevice = true;
 			 }
 
 			 if ($device !== false) {
-			 	// Step 3 - Create tokens
-			 	$authorization = AccessManagerAPI::createAuthorization($operator, $device, $clientID);
+			 	// Step 3 - Create authorization
+			 	$authorization = AccessManagerAPI::createAuthorization($operator, $device, $clientID, $newDevice);
 				if ($authorization !== false) {
-					//$authorization->save();
+					$authorization->save();
 				}
 			 }
 		}
 
 		if (!is_null($authorization) && $authorization !== false) {
-			/*$authTokens = array('accesstoken' => $authorization->accesstoken,
-								 'accessduration' => $authorization->accessduration,
-								 'refreshtoken' => $authorization->refreshtoken,
-								 'refreshduration' => $authorization->refreshduration);	*/
-								 
-			// If we get here, persist the device and authorization
-			$device->save();
-			$authorization->deviceid = $device->id;
-			$authorization->save();
-			
-			// var_dump($authorization);
-			
+
 			// TODO: Ensure that everything is persisted before we return the tokens
 			return $authorization;
 		}
@@ -104,24 +90,76 @@ class AccessManagerAPI
 		return false;
 	 }
 	 
+
 	/**
-	 * This method is used to create a new authorization record
-	 * @param array $operator - The operator associated with the access token
-	 * @param Device $device - The device associated with the access token
-	 * @param string $clientID - The client ID of the app
+	 * Determines if the given access token is valid to access the system
 	 * 
-	 * @return Authorization - An Authorization instance. 
+	 * @param string $accessToken	The access token to check
+	 * 
+	 * @return bool true if allowed. 
+	 * 
+	 * @throws \Mibew\Exception\AccessDeniedException
+	 * 
+	 * Exception codes are:
+	 * 			1 = invalid token
+	 * 			2 = expired token
 	 */
-	 private static function createAuthorization($operator, $device, $clientID) {
+	 public static function isAuthorized($accessToken) {
+	 	$authorization = Authorization::loadByAccessToken($accessToken);
+		if ($authorization == false) {
+			throw new Exception\AccessDeniedException("Invalid token", 1);
+		}
+		
+		$currTime = time();
+		if ($currTime > ($authorization->dtmaccesscreated + 
+						 $authorization->accessduration)) {
+			throw new Exception\AccessDeniedException("expired token", 2);
+		}
+		
+		// TODO: At a future iteration we will also check access scopes
+
+		return true;
+	 }	 
+
+
+
+
+
+	 // *********************************************
+	 //  PRIVATE HELPER METHODS
+	 // *********************************************
+	 
+	/**
+	 * This method is used to create a new authorization record.
+	 * Note: 	We want to ensure that only one user is logged in per device/client.
+	 * 			If a device is being re-used, delete previous authorizations. 
+	 * 
+	 * @param array 	$operator	The operator associated with the access token
+	 * @param Device 	$device		The device associated with the access token
+	 * @param string 	$clientID	The client ID of the app
+	 * @param boolean 	$newDevice	Indicates if this is a new device being added
+	 * 
+	 * @return Authorization|bool	An Authorization instance. 
+	 */
+	 private static function createAuthorization($operator, $device, $clientID, $newDevice) {
+	 	
+		// Check if we need to delete previous authorizations.
+		if (!$newDevice) {
+			$prevAuths = Authorization::allByDevice($device->id);
+			foreach($prevAuths as $auth) {
+				$auth->delete();
+			} 
+		}
+		
 	 	$currTime = time();
 		
 		// Create access token: sha256 of operator login + time
-		$tmp = Constants::$TOKEN_VERSION . "\x0" . Constants::$ACCESS_DURATION . "\x0";
+		$tmp = Constants::$TOKEN_VERSION . "\x0" . $currTime + Constants::$ACCESS_DURATION . "\x0";
 		$tmp .= hash("sha256", $operator['login'] . $currTime, true);
 		$accesstoken = strtr(base64_encode($tmp), '+/=', '-_,');
 		
 		// Create refresh token: sha256 of deviceuuid + time
-		$tmp = Constants::$TOKEN_VERSION . "\x0" . Constants::$REFRESH_DURATION . "\x0";
+		$tmp = Constants::$TOKEN_VERSION . "\x0" . $currTime + Constants::$REFRESH_DURATION . "\x0";
 		$tmp .= hash("sha256", $device->deviceuuid . $currTime, true);
 		$refreshtoken = strtr(base64_encode($tmp), '+/=', '-_,');
 		
@@ -131,7 +169,7 @@ class AccessManagerAPI
 							
 		return $authorization;
 	 }
-	     
+	 
     /**
      * This class should not be instantiated
      */
@@ -140,3 +178,4 @@ class AccessManagerAPI
     }
 }
  
+

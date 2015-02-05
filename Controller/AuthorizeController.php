@@ -20,6 +20,7 @@
 namespace Wurrd\Mibew\Plugin\ClientAuthorization\Controller;
 
 use Mibew\Controller\AbstractController;
+use Mibew\Http\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
@@ -27,8 +28,12 @@ use Wurrd\Mibew\Plugin\ClientAuthorization\Classes\AccessManagerAPI;
 
  
  /**
- * Controller used for authorization.
- */
+  * Controller used for authorization.
+  * 
+  * This controller returns JSON encoded output. The output format can 
+  * be abstracted such that there is an output factory that will return
+  * the results in the requested format.
+  */
 class AuthorizeController extends AbstractController
 {
     /**
@@ -38,7 +43,6 @@ class AuthorizeController extends AbstractController
      * @param Request $request Incoming request.
      * @return Response Rendered page content.
      */
-    //public function loginAction($client_id, $username, $password, Request $request)
     public function requestAccessAction(Request $request)
 	{
 		$response = new Response();
@@ -67,5 +71,45 @@ class AuthorizeController extends AbstractController
 		
 		return $response;
     }
+
+
+    /**
+     * Determine if the requester can access the system with this token
+     *
+     * @param Request $request Incoming request.
+     * @return Response Rendered page content.
+     */
+    public function authorizedAction(Request $request)
+	{
+		$httpStatus = Response::HTTP_OK;
+		$message;
+		
+		$accessToken = $request->attributes->get("accesstoken");
+		try {
+			if (AccessManagerAPI::isAuthorized($accessToken)) {
+				$message = 'Authorized';
+			}
+		} catch(Exception\HttpException $e) {
+			$httpStatus = $e->getStatusCode();
+			$message = $e->getMessage();
+		}
+		
+		$response = new Response(json_encode(array('accesstoken' => $accessToken,
+													'message' => $message)),
+								$httpStatus,
+								array('content-type' => 'application/json'));
+		return $response;
+    }
+
+    /**
+     * This is used for testing purposes
+     */
+    public function testInheritanceAction(Request $request)
+	{
+		$response = new Response("Routed well");
+		AccessManagerAPI::testInheritance();
+			
+		return $response;
+	}
 }
 

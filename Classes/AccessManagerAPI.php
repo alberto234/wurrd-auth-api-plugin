@@ -24,6 +24,8 @@ use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Model\Device;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Model\Authorization;
 
+//const MSG_INVALID_ACCESS_TOKEN 		= 'InvalidAccessToken';
+
 /**
  * Interface to manage access to Mibew from devices such as 
  * mobile apps or third-party webapps
@@ -45,13 +47,13 @@ class AccessManagerAPI
 	 	//		 2 - Implement a proper exception handling framework.
 	 	
 	 	// Step 1 - Get the operator and confirm access to the system
-        $login = $args[Constants::$USERNAME_KEY];
-        $password = $args[Constants::$PASSWORD_KEY];
-        $deviceuuid = $args[Constants::$DEVICEUUID_KEY];
-        $platform = $args[Constants::$PLATFORM_KEY];
-        $type = $args[Constants::$TYPE_KEY];
-        $devicename = $args[Constants::$DEVICENAME_KEY];
-		$clientID = $args[Constants::$CLIENTID_KEY];
+        $login = $args[Constants::USERNAME_KEY];
+        $password = $args[Constants::PASSWORD_KEY];
+        $deviceuuid = $args[Constants::DEVICEUUID_KEY];
+        $platform = $args[Constants::PLATFORM_KEY];
+        $type = $args[Constants::TYPE_KEY];
+        $devicename = $args[Constants::DEVICENAME_KEY];
+		$clientID = $args[Constants::CLIENTID_KEY];
 
         $operator = operator_by_login($login);
         $operator_can_login = $operator
@@ -95,9 +97,7 @@ class AccessManagerAPI
 	 * Determines if the given access token is valid to access the system
 	 * 
 	 * @param string $accessToken	The access token to check
-	 * 
 	 * @return bool true if allowed. 
-	 * 
 	 * @throws \Mibew\Exception\AccessDeniedException
 	 * 
 	 * Exception codes are:
@@ -107,18 +107,93 @@ class AccessManagerAPI
 	 public static function isAuthorized($accessToken) {
 	 	$authorization = Authorization::loadByAccessToken($accessToken);
 		if ($authorization == false) {
-			throw new Exception\AccessDeniedException("Invalid token", 1);
+			throw new Exception\AccessDeniedException(Constants::MSG_INVALID_ACCESS_TOKEN, 1);
 		}
 		
 		$currTime = time();
-		if ($currTime > ($authorization->dtmaccesscreated + 
-						 $authorization->accessduration)) {
-			throw new Exception\AccessDeniedException("expired token", 2);
+		if ($currTime > $authorization->dtmaccessexpires) {
+			throw new Exception\AccessDeniedException(Constants::MSG_EXPIRED_ACCESS_TOKEN, 2);
 		}
 		
 		// TODO: At a future iteration we will also check access scopes
 
 		return true;
+	 }	 
+
+	/**
+	 * Refreshes the tokens
+	 * 
+	 * @param string $accessToken	The access token to check
+	 * @param string $refresToken	An unexpired refresh token is needed for this
+	 * @return Authorization - An instance of Authorization or false if a failure
+	 * @throws \Mibew\Http\Exception\HttpException	-- and subclasses
+	 * 
+	 * Exception codes are:
+	 * 			1 = invalid access token
+	 * 			3 = invalid refresh token
+	 * 			4 = expired refresh token
+	 * 			5 = couldn't retrieve the operator
+	 * 			6 = couldn't retrieve the device
+	 */
+	 public static function refreshAccess($accessToken, $refreshToken)
+	 {
+	 	// TODO: What does it mean for a refresh token to expire? 
+		//		 The current algorithm is that the refresh is on a rolling interval
+		//		 of Constants::REFRESH_DURATION with each refresh.
+		//		 If the client doesn't access the system within that duration, they 
+		//		 will need to login again. REFRESH_DURATION can be made configurable
+		
+	 	$authorization = Authorization::loadByAccessToken($accessToken);
+		if ($authorization == false) {
+			throw new Exception\AccessDeniedException(
+					Constants::MSG_INVALID_ACCESS_TOKEN,
+					1);
+		}
+		
+		if ($authorization->refreshtoken != $refreshToken) {
+			throw new Exception\AccessDeniedException(
+					Constants::MSG_INVALID_REFRESH_TOKEN,
+					3);
+		} else if (time() > $authorization->dtmrefreshexpires) {
+			throw new Exception\AccessDeniedException(
+					Constants::MSG_EXPIRED_REFRESH_TOKEN,
+					4);
+		}
+				
+		$operator = operator_by_id($authorization->operatorid);
+		if ($operator == null) {
+			throw new Exception\HttpException(
+					Response::HTTP_INTERNAL_SERVER_ERROR,
+					Constants::MSG_INVALID_OPERATOR,
+					null,
+					5);
+		}
+		
+		$device = Device::load($authorization->deviceid);
+		if ($device == false) {
+			throw new Exception\HttpException(
+					Response::HTTP_INTERNAL_SERVER_ERROR,
+					Constants::MSG_INVALID_DEVICE,
+					null,
+					6);
+		}
+
+		$newAccessToken = AccessManagerAPI::generateAccessToken($operator['vclogin']);
+		$newRefreshToken = AccessManagerAPI::generateRefreshToken($device->deviceuuid);
+		
+		// Update the authorization
+		$authorization->accesstoken = $newAccessToken['accesstoken'];
+		$authorization->dtmaccessexpires = $newAccessToken['expiretime'];
+		$authorization->dtmaccesscreated = $newAccessToken['created'];
+		
+		$authorization->refreshtoken = $newRefreshToken['refreshtoken'];
+		$authorization->dtmrefreshexpires = $newRefreshToken['expiretime'];
+		$authorization->dtmrefreshcreated = $newRefreshToken['created'];
+		
+		$authorization->save();
+		
+		
+		return $authorization;
 	 }	 
 
 
@@ -150,25 +225,54 @@ class AccessManagerAPI
 				$auth->delete();
 			} 
 		}
+
+		$newAccessToken = AccessManagerAPI::generateAccessToken($operator['vclogin']);
+		$newRefreshToken = AccessManagerAPI::generateRefreshToken($device->deviceuuid);
 		
-	 	$currTime = time();
-		
-		// Create access token: sha256 of operator login + time
-		$tmp = Constants::$TOKEN_VERSION . "\x0" . $currTime + Constants::$ACCESS_DURATION . "\x0";
-		$tmp .= hash("sha256", $operator['login'] . $currTime, true);
-		$accesstoken = strtr(base64_encode($tmp), '+/=', '-_,');
-		
-		// Create refresh token: sha256 of deviceuuid + time
-		$tmp = Constants::$TOKEN_VERSION . "\x0" . $currTime + Constants::$REFRESH_DURATION . "\x0";
-		$tmp .= hash("sha256", $device->deviceuuid . $currTime, true);
-		$refreshtoken = strtr(base64_encode($tmp), '+/=', '-_,');
-		
-		$authorization = Authorization::createNewAuhtorization($accesstoken, Constants::$ACCESS_DURATION,
-							$refreshtoken, Constants::$REFRESH_DURATION, $operator['operatorid'], 
-							$device->id, $clientID, $currTime);
-							
+		$authorization = Authorization::createNewAuhtorization(
+							$newAccessToken['accesstoken'],
+							$newAccessToken['expiretime'],
+							$newAccessToken['created'],
+							$newRefreshToken['refreshtoken'],
+							$newRefreshToken['expiretime'],
+							$newRefreshToken['created'],
+							$operator['operatorid'], 
+							$device->id,
+							$clientID);
+
 		return $authorization;
 	 }
+
+	private static function generateAccessToken($login) 
+	{
+		$currTime = time();
+		$expireTime = $currTime + Constants::ACCESS_DURATION;
+		
+		// Create access token: sha256 of operator login + time
+		$tmp = Constants::TOKEN_VERSION . "\x0" . $expireTime . "\x0";
+		$tmp .= hash("sha256", $login . $currTime, true);
+		$accesstoken = strtr(base64_encode($tmp), '+/=', '-_,');
+		
+		return array('accesstoken' => $accesstoken,
+					 'expiretime' => $expireTime,
+					 'created' => $currTime);
+	}
+	
+	
+	private static function generateRefreshToken($deviceuuid) 
+	{
+		$currTime = time();
+		$expireTime = $currTime + Constants::REFRESH_DURATION;
+		
+		// Create refresh token: sha256 of deviceuuid + time
+		$tmp = Constants::TOKEN_VERSION . "\x0" . $expireTime . "\x0";
+		$tmp .= hash("sha256", $deviceuuid . $currTime, true);
+		$refreshtoken = strtr(base64_encode($tmp), '+/=', '-_,');
+		
+		return array('refreshtoken' => $refreshtoken,
+					 'expiretime' => $expireTime,
+					 'created' => $currTime);
+	}
 	 
     /**
      * This class should not be instantiated

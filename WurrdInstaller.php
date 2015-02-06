@@ -164,7 +164,7 @@ class WurrdInstaller extends Installer
      */
     protected function tablesNeedUpdate()
     {
-        return version_compare($this->getDatabaseVersion(), Constants::$WCA_VERSION, '<');
+        return version_compare($this->getDatabaseVersion(), Constants::WCA_VERSION, '<');
     }
 
     /**
@@ -243,7 +243,7 @@ class WurrdInstaller extends Installer
                     'INSERT INTO {config} (vckey, vcvalue) VALUES (:key, :value)',
                     array(
                         ':key' => 'wcaversion',
-                        ':value' => Constants::$WCA_VERSION,
+                        ':value' => Constants::WCA_VERSION,
                     )
                 );
             }

@@ -26,6 +26,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
 use Wurrd\Mibew\Plugin\ClientAuthorization\Classes\AccessManagerAPI;
 
+const MSG_SUCCESS			 		= 'Success';
+const MSG_INVALID_ACCESS_TOKEN 		= 'InvalidAccessToken';
  
  /**
   * Controller used for authorization.
@@ -45,31 +47,41 @@ class AuthorizeController extends AbstractController
      */
     public function requestAccessAction(Request $request)
 	{
-		$response = new Response();
-		$response->headers->set('Content-Type', 'application/json');
-		
-		$authRequest = json_decode($request->getContent(), true);
+		$httpStatus = Response::HTTP_OK;
+		$message = Constants::MSG_SUCCESS;
+		$arrayOut = array();
+
+		$requestPayload = $request->getContent();
+		$authRequest = json_decode($requestPayload, true);
         $json_error_code = json_last_error();
         if ($json_error_code != JSON_ERROR_NONE) {
             // Not valid JSON
-			$response->setContent(array(
-            	'message' => "The access request package have invalid json structure. JSON error code is '" . 
-            				  $json_error_code . "'"));
-			$response->setStatusCode(Response::HTTP_BAD_REQUEST);
-        }
-		
-		$authorization = AccessManagerAPI::requestAccess($authRequest);
-		
-		$response->setContent(json_encode(array(
-						'accesstoken' => $authorization->accesstoken,
-						'accessduration' => $authorization->accessduration,
-						'accesscreatedtime' => $authorization->dtmaccesscreated,
-						'refreshtoken' => $authorization->refreshtoken,
-						'refreshduration' => $authorization->refreshduration,
-						'refreshcreatedtime' => $authorization->dtmrefreshcreated,
-						)));
-		
+            $message = Constants::MSG_INVALID_JSON;
+			$arrayOut['requestpayload'] = $requestPayload;
+            $httpStatus = Response::HTTP_BAD_REQUEST;
+		} else {
+			try {
+				$authorization = AccessManagerAPI::requestAccess($authRequest);
+				$arrayOut = array(
+							'accesstoken' => $authorization->accesstoken,
+							'accessexpire' => $authorization->dtmaccessexpires,
+							'accesscreated' => $authorization->dtmaccesscreated,
+							'refreshtoken' => $authorization->refreshtoken,
+							'refreshexpire' => $authorization->dtmrefreshexpires,
+							'refreshcreated' => $authorization->dtmrefreshcreated,
+							);
+			} catch(Exception\HttpException $e) {
+				$httpStatus = $e->getStatusCode();
+				$message = $e->getMessage();
+			}
+		}
+
+		$arrayOut['message'] = $message;
+		$response = new Response(json_encode($arrayOut),
+								$httpStatus,
+								array('content-type' => 'application/json'));
 		return $response;
+  
     }
 
 
@@ -82,12 +94,12 @@ class AuthorizeController extends AbstractController
     public function authorizedAction(Request $request)
 	{
 		$httpStatus = Response::HTTP_OK;
-		$message;
+		$message = Constants::MSG_SUCCESS;
 		
 		$accessToken = $request->attributes->get("accesstoken");
 		try {
 			if (AccessManagerAPI::isAuthorized($accessToken)) {
-				$message = 'Authorized';
+				// Do nothing, $message has already been set
 			}
 		} catch(Exception\HttpException $e) {
 			$httpStatus = $e->getStatusCode();
@@ -102,14 +114,39 @@ class AuthorizeController extends AbstractController
     }
 
     /**
-     * This is used for testing purposes
+     * Refresh the access token - Used to refresh an expired token
+     * 
+     * @param Request $request Incoming request.
+     * @return Response Rendered page content.
      */
-    public function testInheritanceAction(Request $request)
+    public function refreshAccessAction(Request $request)
 	{
-		$response = new Response("Routed well");
-		AccessManagerAPI::testInheritance();
-			
+		$httpStatus = Response::HTTP_OK;
+		$message = Constants::MSG_SUCCESS;
+		$arrayOut = array();
+		
+		$accessToken = $request->attributes->get("accesstoken");
+		$refreshToken = $request->attributes->get("refreshtoken");
+		try {
+			$authorization = AccessManagerAPI::refreshAccess($accessToken, $refreshToken);
+			$arrayOut = array(
+						'accesstoken' => $authorization->accesstoken,
+						'accessexpire' => $authorization->dtmaccessexpires,
+						'accesscreated' => $authorization->dtmaccesscreated,
+						'refreshtoken' => $authorization->refreshtoken,
+						'refreshexpire' => $authorization->dtmrefreshexpires,
+						'refreshcreated' => $authorization->dtmrefreshcreated,
+						);
+		} catch(Exception\HttpException $e) {
+			$httpStatus = $e->getStatusCode();
+			$message = $e->getMessage();
+		}
+		
+		$arrayOut['message'] = $message;
+		$response = new Response(json_encode($arrayOut),
+								$httpStatus,
+								array('content-type' => 'application/json'));
 		return $response;
-	}
+    }
 }
 

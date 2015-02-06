@@ -75,11 +75,11 @@ class Authorization
     public $dtmaccesscreated;
 
     /**
-     * Duration in seconds for the access token
+     * When the access token expires.
      *
      * @var int
      */
-    public $accessduration;
+    public $dtmaccessexpires;
 
     /**
      * The refresh token generated for this authorization
@@ -96,11 +96,11 @@ class Authorization
     public $dtmrefreshcreated;
 
     /**
-     * Duration in seconds for the refresh token
+     * When the refresh token expires.
      *
      * @var int
      */
-    public $refreshduration;
+    public $dtmrefreshexpires;
 
     /**
      * Loads authorization by its ID.
@@ -197,19 +197,19 @@ class Authorization
      * Create a new authorization
      *
      */
-    public static function createNewAuhtorization($accessToken, $accessDuration, $refreshToken, $refreshDuration,
-    	$operatorid, $deviceid, $clientid, $createdTime)
+    public static function createNewAuhtorization($accessToken, $accessExpire, $accessCreated,
+    	$refreshToken, $refreshExpire, $refreshCreated, $operatorid, $deviceid, $clientid)
     {
     	$db_fields = array('authid' => false,
     					   'operatorid' => (int)$operatorid,
     					   'deviceid' => (int)$deviceid,
     					   'clientid' => $clientid,
     					   'accesstoken' => $accessToken,
-    					   'dtmaccesscreated' => $createdTime,
-    					   'accessduration' => (int)$accessDuration,
+    					   'dtmaccesscreated' => $accessCreated,
+    					   'dtmaccessexpires' => $accessExpire,
     					   'refreshtoken' => $refreshToken,
-    					   'dtmrefreshcreated' => $createdTime,
-    					   'refreshduration' => (int)$refreshDuration
+    					   'dtmrefreshcreated' => $refreshCreated,
+    					   'dtmrefreshexpires' => $refreshExpire
     				);
 
         // Create and populate authorization object
@@ -256,19 +256,19 @@ class Authorization
             // This authorization is new.
             $db->query(
                 ("INSERT INTO {wca_authorization} (operatorid, deviceid, clientid, accesstoken, "
-					. "dtmaccesscreated, accessduration, refreshtoken, dtmrefreshcreated, refreshduration) "
+					. "dtmaccesscreated, dtmaccessexpires, refreshtoken, dtmrefreshcreated, dtmrefreshexpires) "
                     . "VALUES (:operatorid, :deviceid, :clientid, :accesstoken, :dtmaccesscreated, "
-					. ":accessduration, :refreshtoken, :dtmrefreshcreated, :refreshduration)"),
+					. ":dtmaccessexpires, :refreshtoken, :dtmrefreshcreated, :dtmrefreshexpires)"),
                 array(
                     ':operatorid' => (int)$this->operatorid,
                     ':deviceid' => (int)$this->deviceid,
                     ':clientid' => $this->clientid,
                     ':accesstoken' => $this->accesstoken,
                     ':dtmaccesscreated' => $this->dtmaccesscreated,
-                    ':accessduration' => $this->accessduration,
+                    ':dtmaccessexpires' => $this->dtmaccessexpires,
                     ':refreshtoken' => $this->refreshtoken,
                     ':dtmrefreshcreated' => $this->dtmrefreshcreated,
-                    ':refreshduration' => $this->refreshduration,
+                    ':dtmrefreshexpires' => $this->dtmrefreshexpires,
  				)
             );
             $this->id = $db->insertedId();
@@ -277,17 +277,17 @@ class Authorization
             // Update existing authorization
             $db->query(
                 ("UPDATE {wca_authorization} SET accesstoken = :accesstoken, dtmaccesscreated = :dtmaccesscreated, "
-                    . "accessduration = :accessduration, refreshtoken = :refreshtoken, "
-                    . "dtmrefreshcreated = :dtmrefreshcreated, refreshduration = :refreshduration "
+                    . "dtmaccessexpires = :dtmaccessexpires, refreshtoken = :refreshtoken, "
+                    . "dtmrefreshcreated = :dtmrefreshcreated, dtmrefreshexpires = :dtmrefreshexpires "
                     . "WHERE authid = :id"),
                 array(
                     ':id' => $this->id,
                     ':accesstoken' => $this->accesstoken,
                     ':dtmaccesscreated' => $this->dtmaccesscreated,
-                    ':accessduration' => $this->accessduration,
+                    ':dtmaccessexpires' => $this->dtmaccessexpires,
                     ':refreshtoken' => $this->refreshtoken,
                     ':dtmrefreshcreated' => $this->dtmrefreshcreated,
-                    ':refreshduration' => $this->refreshduration,
+                    ':dtmrefreshexpires' => $this->dtmrefreshexpires,
                 )
             );
         }
@@ -307,9 +307,9 @@ class Authorization
         $this->clientid = $db_fields['clientid'];
         $this->accesstoken = $db_fields['accesstoken'];
         $this->dtmaccesscreated = $db_fields['dtmaccesscreated'];
-        $this->accessduration = $db_fields['accessduration'];
+        $this->dtmaccessexpires = $db_fields['dtmaccessexpires'];
         $this->refreshtoken = $db_fields['refreshtoken'];
         $this->dtmrefreshcreated= $db_fields['dtmrefreshcreated'];
-        $this->refreshduration = $db_fields['refreshduration'];
+        $this->dtmrefreshexpires = $db_fields['dtmrefreshexpires'];
     }
  }

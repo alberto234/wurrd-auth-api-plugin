@@ -27,25 +27,34 @@ namespace Wurrd\Mibew\Plugin\ClientAuthorization;
  * Constants
  */
 class Constants
-{    
-	/**
-     * The version of the plugin
-     */
-    public static  $WCA_VERSION 	= '0.1.0';
-    public static  $TOKEN_VERSION 	= '1';
+{
+	// Version informatiom    
+    const WCA_VERSION 		= '0.1.0';
+    const TOKEN_VERSION 	= '1';
+	
+	// API response messages
+	const MSG_SUCCESS			 		= 'Success';
+	const MSG_UNKNOWN_ERROR				= 'UnknownError';
+	const MSG_INVALID_ACCESS_TOKEN 		= 'InvalidAccessToken';
+	const MSG_EXPIRED_ACCESS_TOKEN 		= 'ExpiredAccessToken';
+	const MSG_INVALID_REFRESH_TOKEN 	= 'InvalidRefreshToken';
+	const MSG_EXPIRED_REFRESH_TOKEN 	= 'ExpiredRefreshToken';
+	const MSG_INVALID_OPERATOR			= 'InvalidOperator';
+	const MSG_INVALID_DEVICE			= 'InvalidDevice';
+	const MSG_INVALID_JSON				= 'InvalidJSON';
 	
 	// Constants for keys used to request access
-	public static $CLIENTID_KEY 	= 'clientid';
-	public static $USERNAME_KEY 	= 'username';
-	public static $PASSWORD_KEY 	= 'password';
-	public static $DEVICEUUID_KEY 	= 'deviceuuid';
-	public static $PLATFORM_KEY 	= 'platform';
-	public static $TYPE_KEY 		= 'type';
-	public static $DEVICENAME_KEY 	= 'devicename';
+	const CLIENTID_KEY 	= 'clientid';
+	const USERNAME_KEY 	= 'username';
+	const PASSWORD_KEY 	= 'password';
+	const DEVICEUUID_KEY 	= 'deviceuuid';
+	const PLATFORM_KEY 	= 'platform';
+	const TYPE_KEY 		= 'type';
+	const DEVICENAME_KEY 	= 'devicename';
 	
 	// Defaults for authorization
-	public static $ACCESS_DURATION	 	= 3600;			// One hour
-	public static $REFRESH_DURATION 	= 604800;		// One week
+	const ACCESS_DURATION	 	= 3600;			// One hour
+	const REFRESH_DURATION 	= 604800;		// One week
 	
     /**
      * This class should not be instantiated

@@ -87,7 +87,7 @@ class Plugin extends AbstractPlugin implements PluginInterface
      */
     public static function getVersion()
     {
-        return Constants::$WCA_VERSION;
+        return Constants::WCA_VERSION;
     }
 
 

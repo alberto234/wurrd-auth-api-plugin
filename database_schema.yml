@@ -29,13 +29,13 @@ wca_authorization:
         accesstoken: "varchar(256) NOT NULL"
         # Unix timestamp of the moment when the access token was created.
         dtmaccesscreated: "int NOT NULL"
-        # duration in seconds for the access token.
-        accessduration: "int NOT NULL"
+        # When the access token expires.
+        dtmaccessexpires: "int NOT NULL"
         # refresh token
         refreshtoken: "varchar(256) NOT NULL"
         # Unix timestamp of the moment when the refresh token was created.
         dtmrefreshcreated: "int NOT NULL"
-        # duration in seconds for the refresh token.
-        refreshduration: "int NOT NULL"
+        # When the refresh token expires.
+        dtmrefreshexpires: "int NOT NULL"
         # TODO: How do we capture scope?
 

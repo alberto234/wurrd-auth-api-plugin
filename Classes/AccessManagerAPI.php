@@ -197,6 +197,46 @@ class AccessManagerAPI
 	 }	 
 
 
+	/**
+	 * Drop access from the system -- revoke tokens
+	 * 
+	 * @param string $accessToken	The access token to drop
+	 * @param string $deviceuuid	The unique id of the device associated with this token
+	 * @return bool true if successful. 
+	 * @throws \Mibew\Exception\AccessDeniedException
+	 * 
+	 * Exception codes are:
+	 * 			1 = invalid token
+	 * 			2 = invalid device
+	 */
+	 public static function dropAccess($accessToken, $deviceuuid) {
+	 	$authorization = Authorization::loadByAccessToken($accessToken);
+		if ($authorization == false) {
+			throw new Exception\AccessDeniedException(Constants::MSG_INVALID_ACCESS_TOKEN, 1);
+		}
+		
+		$device = Device::load($authorization->deviceid);
+		if ($device == false) {
+			throw new Exception\HttpException(
+					Response::HTTP_INTERNAL_SERVER_ERROR,
+					Constants::MSG_INVALID_DEVICE,
+					null,
+					2);
+		}
+		
+		if ($device->deviceuuid != $deviceuuid) {
+			throw new Exception\AccessDeniedException(Constants::MSG_INVALID_DEVICE, 2);
+		}
+
+		// Given that there currently is a one-to-one relationship between the device and authorization,
+		// i.e., only one access can be given to a particular device, we also have to remove the device
+		// from the database.
+		$authorization->delete();
+		$device->delete();
+		
+		return true;
+	 }	 
+
 
 
 

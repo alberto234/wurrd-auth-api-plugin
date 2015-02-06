@@ -148,5 +148,36 @@ class AuthorizeController extends AbstractController
 								array('content-type' => 'application/json'));
 		return $response;
     }
+
+
+    /**
+     * Drop/Revoke access from the system.
+     *
+     * @param Request $request Incoming request.
+     * @return Response Rendered page content.
+     */
+    public function dropAccessAction(Request $request)
+	{
+		$httpStatus = Response::HTTP_OK;
+		$message = Constants::MSG_SUCCESS;
+		
+		$accessToken = $request->attributes->get("accesstoken");
+		$deviceuuid = $request->attributes->get("deviceuuid");
+		try {
+			if (AccessManagerAPI::dropAccess($accessToken, $deviceuuid)) {
+				// Do nothing, $message has already been set
+			}
+		} catch(Exception\HttpException $e) {
+			$httpStatus = $e->getStatusCode();
+			$message = $e->getMessage();
+		}
+		
+		$response = new Response(json_encode(array('accesstoken' => $accessToken,
+													'message' => $message)),
+								$httpStatus,
+								array('content-type' => 'application/json'));
+		return $response;
+    }
+
 }
 

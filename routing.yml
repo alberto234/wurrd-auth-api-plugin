@@ -32,6 +32,6 @@ wurrd_client_auth_drop_access:
     path: /wurrd/client/dropaccess/{accesstoken}/{deviceuuid}
     defaults:
         _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::dropAccessAction
-    methods: [POST]
+    methods: [DELETE]
 
 

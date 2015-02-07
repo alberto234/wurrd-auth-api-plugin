@@ -1,8 +1,8 @@
-# This file contains current database schema for the Wurrd:ClientAuthorization plugin.
+# This file contains current database schema for the Wurrd:AuthAPI plugin.
 # Do not change anything in this file unless you know what you are doing!
 
 # Contains information about devices. .
-wca_device:
+waa_device:
     fields:
         # Internal ID for this device.
         deviceid: "int NOT NULL auto_increment PRIMARY KEY"
@@ -15,8 +15,8 @@ wca_device:
         # Device name, as given by the manufacturer
         name: "varchar(256)"
         
-# Contains information about client authorizations
-wca_authorization:
+# Contains information about authorizations
+waa_authorization:
     fields:
         authid: "int NOT NULL auto_increment PRIMARY KEY"
         # Operator associated with this authorization. Foreign key for {operator}.operatorid

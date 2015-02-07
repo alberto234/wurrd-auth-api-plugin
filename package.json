@@ -1,10 +1,10 @@
 {
-    "name": "client-authorization-plugin",
+    "name": "wurrd-auth-api-plugin",
     "version": "0.1.0",
-    "description": "A plugin for Mibew that handles authorization and access for connected clients.",
+    "description": "A plugin for Mibew that provides APIs for authentication.",
     "private": true,
     "bugs": {
-        "url": "https://github.com/alberto234/client-authorization-plugin/issues"
+        "url": "https://github.com/alberto234/wurrd-auth-api-plugin/issues"
     },
     "devDependencies": {
         "gulp": "~3.8.10",

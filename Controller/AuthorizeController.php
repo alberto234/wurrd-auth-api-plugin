@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is a part of Wurrd ClientAuthorization Plugin.
+ * This file is a part of Wurrd AuthAPI Plugin.
  *
  * Copyright 2015 Eyong N <eyongn@scalior.com>.
  *
@@ -17,14 +17,14 @@
  * limitations under the License.
  */
 
-namespace Wurrd\Mibew\Plugin\ClientAuthorization\Controller;
+namespace Wurrd\Mibew\Plugin\AuthAPI\Controller;
 
 use Mibew\Controller\AbstractController;
 use Mibew\Http\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
-use Wurrd\Mibew\Plugin\ClientAuthorization\Classes\AccessManagerAPI;
+use Wurrd\Mibew\Plugin\AuthAPI\Constants;
+use Wurrd\Mibew\Plugin\AuthAPI\Classes\AccessManagerAPI;
 
 const MSG_SUCCESS			 		= 'Success';
 const MSG_INVALID_ACCESS_TOKEN 		= 'InvalidAccessToken';

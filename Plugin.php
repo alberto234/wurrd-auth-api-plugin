@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is a part of Wurrd Client Authorization Plugin.
+ * This file is a part of Wurrd AuthAPI Plugin.
  *
  * Copyright 2015 Eyong N <eyongn@scalior.com>.
  *
@@ -18,15 +18,15 @@
  */
 
 /**
- * @file The main file of Wurrd:ClientAuthorization plugin.
+ * @file The main file of Wurrd:AuthAPI plugin.
  */
 
-namespace Wurrd\Mibew\Plugin\ClientAuthorization;
+namespace Wurrd\Mibew\Plugin\AuthAPI;
 
 use Mibew\Plugin\AbstractPlugin;
 use Mibew\Plugin\PluginInterface;
-use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
-use Wurrd\Mibew\Plugin\ClientAuthorization\WurrdInstaller;
+use Wurrd\Mibew\Plugin\AuthAPI\Constants;
+use Wurrd\Mibew\Plugin\AuthAPI\WurrdInstaller;
 
 /**
  * The main plugin's file definition.
@@ -87,7 +87,7 @@ class Plugin extends AbstractPlugin implements PluginInterface
      */
     public static function getVersion()
     {
-        return Constants::WCA_VERSION;
+        return Constants::WAA_VERSION;
     }
 
 

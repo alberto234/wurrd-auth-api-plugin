@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is a part of Wurrd ClientAuthorization Plugin.
+ * This file is a part of Wurrd AuthAPI Plugin.
  *
  * Copyright 2015 Eyong N <eyongn@scalior.com>.
  *
@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-namespace Wurrd\Mibew\Plugin\ClientAuthorization\Model;
+namespace Wurrd\Mibew\Plugin\AuthAPI\Model;
 
 use Mibew\Database;
 
@@ -82,7 +82,7 @@ class Device
 
         // Load device info
         $device_info = Database::getInstance()->query(
-            "SELECT * FROM {wca_device} WHERE deviceid = :id",
+            "SELECT * FROM {waa_device} WHERE deviceid = :id",
             array(':id' => $id),
             array('return_rows' => Database::RETURN_ONE_ROW)
         );
@@ -115,7 +115,7 @@ class Device
 
         // Load device info
         $device_info = Database::getInstance()->query(
-            "SELECT * FROM {wca_device} WHERE deviceuuid = :uuid and platform = :platform",
+            "SELECT * FROM {waa_device} WHERE deviceuuid = :uuid and platform = :platform",
             array(':uuid' => $uuid,
 				  ':platform' => $platform),
             array('return_rows' => Database::RETURN_ONE_ROW)
@@ -213,7 +213,7 @@ class Device
         }
 
         Database::getInstance()->query(
-            "DELETE FROM {wca_device} WHERE deviceid = :id LIMIT 1",
+            "DELETE FROM {waa_device} WHERE deviceid = :id LIMIT 1",
             array(':id' => $this->id)
         );
     }
@@ -229,7 +229,7 @@ class Device
         if (!$this->id) {
             // This device is new.
             $db->query(
-                ("INSERT INTO {wca_device} (deviceuuid, platform, type, name) "
+                ("INSERT INTO {waa_device} (deviceuuid, platform, type, name) "
                     . "VALUES (:uuid, :platform, :type, :name)"),
                 array(
                     ':uuid' => $this->deviceuuid,
@@ -246,7 +246,7 @@ class Device
  			/*
             // Update existing device
             $db->query(
-                ("UPDATE {wca_device} SET deviceuuid = :uuid, platform = :platform, "
+                ("UPDATE {waa_device} SET deviceuuid = :uuid, platform = :platform, "
                     . "type = :type, name = :name WHERE deviceid = :id"),
                 array(
                     ':id' => $this->id,

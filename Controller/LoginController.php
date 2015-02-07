@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is a part of Wurrd ClientAuthorization Plugin.
+ * This file is a part of Wurrd AuthAPI Plugin.
  *
  * Copyright 2015 Eyong N <eyongn@scalior.com>.
  *
@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-namespace Wurrd\Mibew\Plugin\ClientAuthorization\Controller;
+namespace Wurrd\Mibew\Plugin\AuthAPI\Controller;
 
 use Mibew\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

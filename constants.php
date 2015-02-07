@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is a part of Wurrd Client Authorization Plugin.
+ * This file is a part of Wurrd AuthAPI Plugin.
  *
  * Copyright 2015 Eyong N <eyongn@scalior.com>.
  *
@@ -18,10 +18,10 @@
  */
 
 /**
- * @file Constants used by the Wurrd:ClientAuthorization plugin.
+ * @file Constants used by the Wurrd:AuthAPI plugin.
  */
 
-namespace Wurrd\Mibew\Plugin\ClientAuthorization;
+namespace Wurrd\Mibew\Plugin\AuthAPI;
 
 /**
  * Constants
@@ -29,7 +29,7 @@ namespace Wurrd\Mibew\Plugin\ClientAuthorization;
 class Constants
 {
 	// Version informatiom    
-    const WCA_VERSION 		= '0.1.0';
+    const WAA_VERSION 		= '0.1.0';
     const TOKEN_VERSION 	= '1';
 	
 	// API response messages

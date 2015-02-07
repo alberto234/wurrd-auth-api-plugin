@@ -11,9 +11,9 @@ gulp.task('prepare-release', function() {
 
     return eventStream.merge(
         getSources()
-            .pipe(zip('client-authorization-plugin-' + version + '.zip')),
+            .pipe(zip('wurrd-auth-api-plugin-' + version + '.zip')),
         getSources()
-            .pipe(tar('client-authorization-plugin-' + version + '.tar'))
+            .pipe(tar('wurrd-auth-api-plugin-' + version + '.tar'))
             .pipe(gzip())
     )
     .pipe(chmod(0644))
@@ -32,14 +32,20 @@ gulp.task('default', ['prepare-release'], function() {
  */
 var getSources = function() {
     return gulp.src([
+            'constants.php',
+            'database_schema.yml',
+            'routing.yml',
             'Plugin.php',
+            'WurrdInstaller.php',
             'README.md',
-            'LICENSE'
+            'LICENSE',
+            'Classes/*',
+            'Controller/*',
+            'Model/*'
         ],
         {base: './'}
     )
     .pipe(rename(function(path) {
-        path.dirname = 'Wurrd/Mibew/Plugin/ClientAuthorization/' + path.dirname;
+        path.dirname = 'Wurrd/Mibew/Plugin/AuthAPI/' + path.dirname;
     }));
 }
-d

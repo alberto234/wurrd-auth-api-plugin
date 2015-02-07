@@ -1,37 +1,37 @@
 # Custom routes to handle authorization requests
 wurrd_client_auth_login:
     # Relative path from the Mibew web root is used here.
-    path: /wurrd/client/login/{client_id}/{username}/{password}
+    path: /wurrd/auth/login/{client_id}/{username}/{password}
     # Set some defaults for the request
     defaults:
         # This value is special. It tells the system what action should be
         # invoked for the response
-        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\LoginController::loginAction
+        _controller: Wurrd\Mibew\Plugin\AuthAPI\Controller\LoginController::loginAction
 
 wurrd_client_auth_request_access:
-    path: /wurrd/client/requestaccess
+    path: /wurrd/auth/requestaccess
     defaults:
-        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::requestAccessAction
+        _controller: Wurrd\Mibew\Plugin\AuthAPI\Controller\AuthorizeController::requestAccessAction
     methods: [POST]
 
 # This route should only be available for testing purposes. The intention is that access will be verified by
 # other plugins using the AccessManager API
 wurrd_client_auth_authorized:
-    path: /wurrd/client/authorized/{accesstoken}
+    path: /wurrd/auth/authorized/{accesstoken}
     defaults:
-        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::authorizedAction
+        _controller: Wurrd\Mibew\Plugin\AuthAPI\Controller\AuthorizeController::authorizedAction
     methods: [GET]
 
 wurrd_client_auth_refresh_access:
-    path: /wurrd/client/refreshaccess/{accesstoken}/{refreshtoken}
+    path: /wurrd/auth/refreshaccess/{accesstoken}/{refreshtoken}
     defaults:
-        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::refreshAccessAction
+        _controller: Wurrd\Mibew\Plugin\AuthAPI\Controller\AuthorizeController::refreshAccessAction
     methods: [POST]
 
 wurrd_client_auth_drop_access:
-    path: /wurrd/client/dropaccess/{accesstoken}/{deviceuuid}
+    path: /wurrd/auth/dropaccess/{accesstoken}/{deviceuuid}
     defaults:
-        _controller: Wurrd\Mibew\Plugin\ClientAuthorization\Controller\AuthorizeController::dropAccessAction
+        _controller: Wurrd\Mibew\Plugin\AuthAPI\Controller\AuthorizeController::dropAccessAction
     methods: [DELETE]
 
 

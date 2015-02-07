@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is a part of Wurrd ClientAuthorization plugin.
+ * This file is a part of Wurrd AuthAPI plugin.
  *
  * Copyright 2005-2015 the original author or authors.
  *
@@ -17,13 +17,13 @@
  * limitations under the License.
  */
 
-namespace Wurrd\Mibew\Plugin\ClientAuthorization;
+namespace Wurrd\Mibew\Plugin\AuthAPI;
 
 use Mibew\Database;
 use Mibew\Mail\Utils as MailUtils;
 use Mibew\Maintenance\Installer;
 use Symfony\Component\Yaml\Parser as YamlParser;
-use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
+use Wurrd\Mibew\Plugin\AuthAPI\Constants;
 
 /**
  * Encapsulates installation process.
@@ -124,7 +124,7 @@ class WurrdInstaller extends Installer
     }
 	
     /**
-     * Gets version of existing database structure for the Wurrd:ClientAuthorization plugin.
+     * Gets version of existing database structure for the Wurrd:AuthAPI plugin.
      *
      * If the plugin is not installed yet boolean false will be returned.
      *
@@ -164,7 +164,7 @@ class WurrdInstaller extends Installer
      */
     protected function tablesNeedUpdate()
     {
-        return version_compare($this->getDatabaseVersion(), Constants::WCA_VERSION, '<');
+        return version_compare($this->getDatabaseVersion(), Constants::WAA_VERSION, '<');
     }
 
     /**
@@ -243,7 +243,7 @@ class WurrdInstaller extends Installer
                     'INSERT INTO {config} (vckey, vcvalue) VALUES (:key, :value)',
                     array(
                         ':key' => 'wcaversion',
-                        ':value' => Constants::WCA_VERSION,
+                        ':value' => Constants::WAA_VERSION,
                     )
                 );
             }

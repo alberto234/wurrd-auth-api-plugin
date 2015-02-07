@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is a part of Wurrd ClientAuthorization Plugin.
+ * This file is a part of Wurrd AuthAPI Plugin.
  *
  * Copyright 2015 Eyong N <eyongn@scalior.com>.
  *
@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-namespace Wurrd\Mibew\Plugin\ClientAuthorization\Model;
+namespace Wurrd\Mibew\Plugin\AuthAPI\Model;
 
 use Mibew\Database;
 
@@ -117,7 +117,7 @@ class Authorization
 
         // Load device info
         $auth_info = Database::getInstance()->query(
-            "SELECT * FROM {wca_authorization} WHERE authid = :id",
+            "SELECT * FROM {waa_authorization} WHERE authid = :id",
             array(':id' => $id),
             array('return_rows' => Database::RETURN_ONE_ROW)
         );
@@ -144,7 +144,7 @@ class Authorization
     	$authorizations = array();
 		
         $rows = Database::getInstance()->query(
-            "SELECT * FROM {wca_authorization} WHERE deviceid = :deviceid",
+            "SELECT * FROM {waa_authorization} WHERE deviceid = :deviceid",
             array(':deviceid' => (int)$deviceID),
             array('return_rows' => Database::RETURN_ALL_ROWS)
         );
@@ -176,7 +176,7 @@ class Authorization
 
         // Load authorization info
         $auth_info = Database::getInstance()->query(
-            "SELECT * FROM {wca_authorization} WHERE accesstoken = :accesstoken",
+            "SELECT * FROM {waa_authorization} WHERE accesstoken = :accesstoken",
             array(':accesstoken' => $accessToken),
             array('return_rows' => Database::RETURN_ONE_ROW)
         );
@@ -239,7 +239,7 @@ class Authorization
         }
 
         Database::getInstance()->query(
-            "DELETE FROM {wca_authorization} WHERE authid = :id LIMIT 1",
+            "DELETE FROM {waa_authorization} WHERE authid = :id LIMIT 1",
             array(':id' => $this->id)
         );
     }
@@ -255,7 +255,7 @@ class Authorization
         if (!$this->id) {
             // This authorization is new.
             $db->query(
-                ("INSERT INTO {wca_authorization} (operatorid, deviceid, clientid, accesstoken, "
+                ("INSERT INTO {waa_authorization} (operatorid, deviceid, clientid, accesstoken, "
 					. "dtmaccesscreated, dtmaccessexpires, refreshtoken, dtmrefreshcreated, dtmrefreshexpires) "
                     . "VALUES (:operatorid, :deviceid, :clientid, :accesstoken, :dtmaccesscreated, "
 					. ":dtmaccessexpires, :refreshtoken, :dtmrefreshcreated, :dtmrefreshexpires)"),
@@ -276,7 +276,7 @@ class Authorization
         } else {
             // Update existing authorization
             $db->query(
-                ("UPDATE {wca_authorization} SET accesstoken = :accesstoken, dtmaccesscreated = :dtmaccesscreated, "
+                ("UPDATE {waa_authorization} SET accesstoken = :accesstoken, dtmaccesscreated = :dtmaccesscreated, "
                     . "dtmaccessexpires = :dtmaccessexpires, refreshtoken = :refreshtoken, "
                     . "dtmrefreshcreated = :dtmrefreshcreated, dtmrefreshexpires = :dtmrefreshexpires "
                     . "WHERE authid = :id"),

@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is a part of Wurrd ClientAuthorization Plugin.
+ * This file is a part of Wurrd AuthAPI Plugin.
  *
  * Copyright 2015 Eyong N <eyongn@scalior.com>.
  *
@@ -17,12 +17,12 @@
  * limitations under the License.
  */
 
-namespace Wurrd\Mibew\Plugin\ClientAuthorization\Classes;
+namespace Wurrd\Mibew\Plugin\AuthAPI\Classes;
 
 use Mibew\Http\Exception;
-use Wurrd\Mibew\Plugin\ClientAuthorization\Constants;
-use Wurrd\Mibew\Plugin\ClientAuthorization\Model\Device;
-use Wurrd\Mibew\Plugin\ClientAuthorization\Model\Authorization;
+use Wurrd\Mibew\Plugin\AuthAPI\Constants;
+use Wurrd\Mibew\Plugin\AuthAPI\Model\Device;
+use Wurrd\Mibew\Plugin\AuthAPI\Model\Authorization;
 
 //const MSG_INVALID_ACCESS_TOKEN 		= 'InvalidAccessToken';
 

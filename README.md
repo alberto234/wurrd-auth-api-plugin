@@ -1,6 +1,16 @@
-# Mibew Button Refresh plugin
+# Auth API plugin for Mibew by Wurrd
 
-It make the button refresents actual operator's state.
+This plugin provides authentication APIs for Mibew. There are currently two APIs for authentication:
+1. An HTTP API for external applications
+2. A PHP API that is exposed for use by other plugins
+
+## HTTP API
+
+Documentation coming soon
+
+## PHP API 
+
+Documentation coming soon.
 
 
 ## Installation
@@ -14,28 +24,22 @@ It make the button refresents actual operator's state.
 4. (optional) Add plugins configs to "plugins" structure in "`<Mibew root>`/configs/config.yml". If the "plugins" stucture looks like `plugins: []` it will become:
     ```yaml
     plugins:
-        "Mibew:ButtonRefresh": # Plugin's configurations are described below
-            refresh_frequency: 3
-    ```
+        "Wurrd:AuthAPI": # Plugin's configurations are described below
+     		client_id: TEST_CLIENT_ID
+   ```
 
 5. Navigate to "`<Mibew Base URL>`/operator/plugin" page and enable the plugin.
-
-6. Regenerate button at "`<Mibew Base URL>`/operator/button-code" page.
-
-Beware that when the plugin will be disabled or uninstalled the button MUST be regenerated.
 
 
 ## Plugin's configurations
 
 The plugin can be configured with values in "`<Mibew root>`/configs/config.yml" file.
 
-### config.refresh_frequency
+### config.client_id
 
-Type: `Integer`
+Type: `String`
 
-Default: `3`
-
-Specify time in seconds between button refreshes. This value is optional and can be skipped.
+This is a [list of] client id(s) that are allowed to access the system. Still to be impemented
 
 
 ## Build from sources

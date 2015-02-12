@@ -36,11 +36,6 @@ use Wurrd\Mibew\Plugin\AuthAPI\WurrdInstaller;
 class Plugin extends AbstractPlugin implements PluginInterface
 {
     /**
-     * Determine if the plugin was initialized correctly or not.
-     */
-    protected $initialized = false;
-
-    /**
      * List of the plugin configs.
      *
      * @var array

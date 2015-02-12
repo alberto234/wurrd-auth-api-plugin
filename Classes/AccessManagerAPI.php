@@ -24,7 +24,6 @@ use Wurrd\Mibew\Plugin\AuthAPI\Constants;
 use Wurrd\Mibew\Plugin\AuthAPI\Model\Device;
 use Wurrd\Mibew\Plugin\AuthAPI\Model\Authorization;
 
-//const MSG_INVALID_ACCESS_TOKEN 		= 'InvalidAccessToken';
 
 /**
  * Interface to manage access to Mibew from devices such as 
@@ -237,7 +236,15 @@ class AccessManagerAPI
 		return true;
 	 }	 
 
-
+	/**
+	 * Returns the version of this plugin
+	 * 
+	 * @return string plugin version. 
+	 */
+	public static function getAuthAPIPluginVersion()
+	{
+		return Constants::WAA_VERSION;
+	}
 
 
 	 // *********************************************

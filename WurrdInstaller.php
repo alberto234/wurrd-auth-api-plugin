@@ -140,7 +140,7 @@ class WurrdInstaller extends Installer
         try {
             $result = $db->query(
                 "SELECT vcvalue AS version FROM {config} WHERE vckey = :key LIMIT 1",
-                array(':key' => 'wcaversion'),
+                array(':key' => 'waa_version'),
                 array('return_rows' => Database::RETURN_ONE_ROW)
             );
         } catch (\Exception $e) {
@@ -232,7 +232,7 @@ class WurrdInstaller extends Installer
         try {
             list($count) = $db->query(
                 'SELECT COUNT(*) FROM {config} WHERE vckey = :key',
-                array(':key' => 'wcaversion'),
+                array(':key' => 'waa_version'),
                 array(
                     'return_rows' => Database::RETURN_ONE_ROW,
                     'fetch_type' => Database::FETCH_NUM
@@ -242,7 +242,7 @@ class WurrdInstaller extends Installer
                 $db->query(
                     'INSERT INTO {config} (vckey, vcvalue) VALUES (:key, :value)',
                     array(
-                        ':key' => 'wcaversion',
+                        ':key' => 'waa_version',
                         ':value' => Constants::WAA_VERSION,
                     )
                 );
@@ -275,7 +275,7 @@ class WurrdInstaller extends Installer
         try {
             $db->query(
                 'DELETE FROM {config} WHERE vckey = :key',
-                array(':key' => 'wcaversion')
+                array(':key' => 'waa_version')
             );
         } catch (\Exception $e) {
             $this->errors[] = getlocal(

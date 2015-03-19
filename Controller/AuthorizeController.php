@@ -26,9 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Wurrd\Mibew\Plugin\AuthAPI\Constants;
 use Wurrd\Mibew\Plugin\AuthAPI\Classes\AccessManagerAPI;
 
-const MSG_SUCCESS			 		= 'Success';
-const MSG_INVALID_ACCESS_TOKEN 		= 'InvalidAccessToken';
- 
  /**
   * Controller used for authorization.
   * 

@@ -68,6 +68,20 @@ class Device
     public $name;
 
     /**
+     * Device operation system
+     *
+     * @var string
+     */
+    public $os;
+
+    /**
+     * Device operation system version
+     *
+     * @var string
+     */
+    public $osVersion;
+
+    /**
      * Loads device by its ID.
      *
      * @param int $id ID of the device to load
@@ -142,10 +156,11 @@ class Device
 	 * @param string $name The device name
      * @return boolean|Device Returns a Device instance or boolean false on failure.
      */
-    public static function createDevice($uuid, $platform, $type, $name)
+    public static function createDevice($uuid, $platform, $type, $name, $os, $osVersion)
     {
         // Check parameters
-        if (empty($uuid) || empty($platform) || empty($type) || empty($name)) {
+        if (empty($uuid) || empty($platform) || empty($type) || empty($name) ||
+        	empty($os) || empty($osVersion)) {
             return false;
         }
 
@@ -153,7 +168,9 @@ class Device
         					 'deviceuuid' => $uuid,
         					 'platform' => $platform,
         					 'type' => $type,
-        					 'name' => $name);
+        					 'name' => $name,
+							 'os' => $os,
+							 'osversion' => $osVersion);
 							 
         // Create and populate device object
         $device = new self();
@@ -229,13 +246,15 @@ class Device
         if (!$this->id) {
             // This device is new.
             $db->query(
-                ("INSERT INTO {waa_device} (deviceuuid, platform, type, name) "
-                    . "VALUES (:uuid, :platform, :type, :name)"),
+                ("INSERT INTO {waa_device} (deviceuuid, platform, type, name, os, osversion) "
+                    . "VALUES (:uuid, :platform, :type, :name, :os, :osversion)"),
                 array(
                     ':uuid' => $this->deviceuuid,
                     ':platform' => $this->platform,
                     ':type' => $this->type,
                     ':name' => $this->name,
+                    ':os' => $this->os,
+                    ':osversion' => $this->osVersion,
                 )
             );
             $this->id = $db->insertedId();
@@ -272,5 +291,7 @@ class Device
         $this->platform = $db_fields['platform'];
         $this->type = $db_fields['type'];
         $this->name = $db_fields['name'];
+		$this->os = $db_fields['os'];
+		$this->osVersion = $db_fields['osversion'];
     }
 }

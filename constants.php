@@ -35,6 +35,7 @@ class Constants
 	// API response messages
 	const MSG_SUCCESS			 		= 'Success';
 	const MSG_UNKNOWN_ERROR				= 'UnknownError';
+	const MSG_BAD_USERNAME_PASSWORD 	= 'BadUsernameOrPassword';
 	const MSG_INVALID_ACCESS_TOKEN 		= 'InvalidAccessToken';
 	const MSG_EXPIRED_ACCESS_TOKEN 		= 'ExpiredAccessToken';
 	const MSG_INVALID_REFRESH_TOKEN 	= 'InvalidRefreshToken';
@@ -44,13 +45,15 @@ class Constants
 	const MSG_INVALID_JSON				= 'InvalidJSON';
 	
 	// Constants for keys used to request access
-	const CLIENTID_KEY 	= 'clientid';
-	const USERNAME_KEY 	= 'username';
-	const PASSWORD_KEY 	= 'password';
-	const DEVICEUUID_KEY 	= 'deviceuuid';
-	const PLATFORM_KEY 	= 'platform';
-	const TYPE_KEY 		= 'type';
-	const DEVICENAME_KEY 	= 'devicename';
+	const CLIENTID_KEY 			= 'clientid';
+	const USERNAME_KEY 			= 'username';
+	const PASSWORD_KEY 			= 'password';
+	const DEVICEUUID_KEY 		= 'deviceuuid';
+	const PLATFORM_KEY 			= 'platform';
+	const TYPE_KEY 				= 'type';
+	const DEVICENAME_KEY 		= 'devicename';
+	const DEVICEOS_KEY 			= 'os';
+	const DEVICEOSVERSION_KEY 	= 'osversion';
 	
 	// Defaults for authorization
 	const ACCESS_DURATION	 	= 3600;			// One hour

@@ -53,6 +53,8 @@ class AccessManagerAPI
         $type = $args[Constants::TYPE_KEY];
         $devicename = $args[Constants::DEVICENAME_KEY];
 		$clientID = $args[Constants::CLIENTID_KEY];
+		$os = $args[Constants::DEVICEOS_KEY];
+		$osVersion = $args[Constants::DEVICEOSVERSION_KEY];
 
         $operator = operator_by_login($login);
         $operator_can_login = $operator
@@ -68,7 +70,7 @@ class AccessManagerAPI
 			 $device = Device::loadByUUID($deviceuuid, $platform);
 			 if (!$device) {
 			 	// The device is not found, add a new device
-			 	$device = Device::createDevice($deviceuuid, $platform, $type, $devicename);
+			 	$device = Device::createDevice($deviceuuid, $platform, $type, $devicename, $os, $osVersion);
 				$device->save();
 				$newDevice = true;
 			 }

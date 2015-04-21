@@ -14,6 +14,10 @@ waa_device:
         type: "varchar(64)"
         # Device name, as given by the manufacturer
         name: "varchar(256)"
+        # Device operating system
+        os: "varchar(64)"
+        # Device operating system version
+        osversion: "varchar(32)"
         
 # Contains information about authorizations
 waa_authorization:

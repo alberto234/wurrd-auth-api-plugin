@@ -6,11 +6,11 @@ This plugin provides authentication APIs for Mibew. There are currently two APIs
 
 ## HTTP API
 
-Documentation coming soon
+See comments in routing.yml
 
 ## PHP API 
 
-Documentation coming soon.
+See comments in Classes/AccessManagerAPI.php
 
 
 ## Installation

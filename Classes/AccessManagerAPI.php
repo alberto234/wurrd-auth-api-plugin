@@ -32,18 +32,32 @@ use Wurrd\Mibew\Plugin\AuthAPI\Model\Authorization;
 class AccessManagerAPI
 {
 	/**
-	 * This method is used to generate grant access to a device/client. 
+	 * This method is used to grant access to a device/client. 
 	 * This call causes previous access to be revoked.
 	 * 
 	 * @param array $args - An array containing the arguments needed for the
 	 * 					    access token to be generated. The arguments are
 	 * 						defined in constants.php are.
+	 * 						- username
+	 * 						- password
+	 * 						- clientid
+	 * 						- deviceuuid
+	 * 						- type
+	 * 						- devicename
+	 * 						- platform
+	 * 						- os
+	 * 						- osversion
+	 *
+	 * @return Authorization - An instance of Authorization when successful
 	 * 
-	 * @return Authorization - An instance of Authorization or false if a failure
+	 * @throws	\Mibew\Exception\AccessDeniedException
+	 *				With one of the following messages: 
+	 * 					- Constants::MSG_BAD_USERNAME_PASSWORD 
+	 * 			\Mibew\Exception\HttpException
 	 */
 	 public static function requestAccess($args) {
 	 	// TODO: 1 - Learn and use the template function pattern to validate the parameters
-	 	//		 2 - Implement a proper exception handling framework.
+	 	//		 2 - Implement a proper exception handling framework. -- Work in progress
 	 	
 	 	// Step 1 - Get the operator and confirm access to the system
         $login = $args[Constants::USERNAME_KEY];
@@ -63,7 +77,7 @@ class AccessManagerAPI
             && !operator_is_disabled($operator);
 
 
-		$authorization;
+		$authorization = null;
 		if ($operator_can_login) {
 			 // Step 2 - Get/create the device
 			 $newDevice = false;
@@ -82,15 +96,17 @@ class AccessManagerAPI
 					$authorization->save();
 				}
 			 }
-		}
-
-		if (!is_null($authorization) && $authorization !== false) {
-
-			// TODO: Ensure that everything is persisted before we return the tokens
-			return $authorization;
+		} else {
+			throw new Exception\AccessDeniedException(Constants::MSG_BAD_USERNAME_PASSWORD);
 		}
 		
-		return false;
+		if (is_null($authorization) || $authorization === false) {
+			// This means we have a server-side issue, possibly database related
+			throw new Exception\HttpException(Response::HTTP_INTERNAL_SERVER_ERROR,
+												Constants::MSG_UNKNOWN_ERROR);
+		}
+		
+		return $authorization;
 	 }
 	 
 

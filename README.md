@@ -39,7 +39,8 @@ The plugin can be configured with values in "`<Mibew root>`/configs/config.yml" 
 
 Type: `String`
 
-This is a [list of] client id(s) that are allowed to access the system. Still to be impemented
+This is a [list of] client id(s) that are allowed to access the system. Still to be impemented.
+The TEST_CLIENT_ID above is a place holder that should be included. However, this functionality has not been implemented yet
 
 
 ## Build from sources

@@ -55,7 +55,8 @@ class Constants
 	const DEVICEOS_KEY 			= 'os';
 	const DEVICEOSVERSION_KEY 	= 'osversion';
 	
-	// Defaults for authorization
+	// Defaults for authorization.
+	// These could be provided as plugin configurations
 	const ACCESS_DURATION	 	= 3600;			// One hour
 	const REFRESH_DURATION 	= 604800;		// One week
 	

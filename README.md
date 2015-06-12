@@ -12,6 +12,9 @@ See comments in routing.yml
 
 See comments in Classes/AccessManagerAPI.php
 
+## Diagrams
+
+A state diagram can be found in [docs/Wurrd_Authorization_API_State_Diagram.pdf](https://github.com/alberto234/wurrd-auth-api-plugin/blob/master/docs/Wurrd_Authorization_API_State_Diagram.pdf)
 
 ## Installation
 

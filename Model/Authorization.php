@@ -103,6 +103,20 @@ class Authorization
     public $dtmrefreshexpires;
 
     /**
+     * The previous access token generated for this authorization
+     *
+     * @var string
+     */
+    public $previousaccesstoken;
+
+    /**
+     * The previous refresh token generated for this authorization
+     *
+     * @var string
+     */
+    public $previousrefreshtoken;
+	
+    /**
      * Loads authorization by its ID.
      *
      * @param int $id ID of the authorization to load
@@ -194,6 +208,38 @@ class Authorization
     }
 
     /**
+     * Loads authorization by previous access token.
+     *
+     * @param string $previousAccessToken The previous access token.
+     * @return boolean|Authorization Returns an Authorization instance or boolean false on failure.
+     */
+    public static function loadByPreviousAccessToken($previousAccessToken)
+    {
+        // Check parameters
+        if (empty($previousAccessToken)) {
+            return false;
+        }
+
+        // Load authorization info
+        $auth_info = Database::getInstance()->query(
+            "SELECT * FROM {waa_authorization} WHERE previousaccesstoken = :previousAccessToken",
+            array(':previousAccessToken' => $previousAccessToken),
+            array('return_rows' => Database::RETURN_ONE_ROW)
+        );
+
+        // There is no matching authorization in database
+        if (!$auth_info) {
+            return false;
+        }
+
+        // Create and populate authorization object
+        $authorization = new self();
+        $authorization->populateFromDbFields($auth_info);
+
+        return $authorization;
+    }
+
+    /**
      * Create a new authorization
      *
      */
@@ -209,7 +255,9 @@ class Authorization
     					   'dtmaccessexpires' => $accessExpire,
     					   'refreshtoken' => $refreshToken,
     					   'dtmrefreshcreated' => $refreshCreated,
-    					   'dtmrefreshexpires' => $refreshExpire
+    					   'dtmrefreshexpires' => $refreshExpire,
+    					   'previousaccesstoken' => null,
+    					   'previousrefreshtoken' => null,
     				);
 
         // Create and populate authorization object
@@ -256,9 +304,11 @@ class Authorization
             // This authorization is new.
             $db->query(
                 ("INSERT INTO {waa_authorization} (operatorid, deviceid, clientid, accesstoken, "
-					. "dtmaccesscreated, dtmaccessexpires, refreshtoken, dtmrefreshcreated, dtmrefreshexpires) "
+					. "dtmaccesscreated, dtmaccessexpires, refreshtoken, dtmrefreshcreated, dtmrefreshexpires, "
+					. "previousaccesstoken, previousrefreshtoken) "
                     . "VALUES (:operatorid, :deviceid, :clientid, :accesstoken, :dtmaccesscreated, "
-					. ":dtmaccessexpires, :refreshtoken, :dtmrefreshcreated, :dtmrefreshexpires)"),
+					. ":dtmaccessexpires, :refreshtoken, :dtmrefreshcreated, :dtmrefreshexpires, "
+					. ":previousaccesstoken, :previousrefreshtoken)"),
                 array(
                     ':operatorid' => (int)$this->operatorid,
                     ':deviceid' => (int)$this->deviceid,
@@ -269,7 +319,9 @@ class Authorization
                     ':refreshtoken' => $this->refreshtoken,
                     ':dtmrefreshcreated' => $this->dtmrefreshcreated,
                     ':dtmrefreshexpires' => $this->dtmrefreshexpires,
- 				)
+                    ':previousaccesstoken' => $this->previousaccesstoken,
+                    ':previousrefreshtoken' => $this->previousrefreshtoken,
+                )
             );
             $this->id = $db->insertedId();
 
@@ -278,7 +330,8 @@ class Authorization
             $db->query(
                 ("UPDATE {waa_authorization} SET accesstoken = :accesstoken, dtmaccesscreated = :dtmaccesscreated, "
                     . "dtmaccessexpires = :dtmaccessexpires, refreshtoken = :refreshtoken, "
-                    . "dtmrefreshcreated = :dtmrefreshcreated, dtmrefreshexpires = :dtmrefreshexpires "
+                    . "dtmrefreshcreated = :dtmrefreshcreated, dtmrefreshexpires = :dtmrefreshexpires, "
+                    . "previousaccesstoken = :previousaccesstoken, previousrefreshtoken = :previousrefreshtoken "
                     . "WHERE authid = :id"),
                 array(
                     ':id' => $this->id,
@@ -288,6 +341,8 @@ class Authorization
                     ':refreshtoken' => $this->refreshtoken,
                     ':dtmrefreshcreated' => $this->dtmrefreshcreated,
                     ':dtmrefreshexpires' => $this->dtmrefreshexpires,
+                    ':previousaccesstoken' => $this->previousaccesstoken,
+                    ':previousrefreshtoken' => $this->previousrefreshtoken,
                 )
             );
         }
@@ -311,5 +366,7 @@ class Authorization
         $this->refreshtoken = $db_fields['refreshtoken'];
         $this->dtmrefreshcreated= $db_fields['dtmrefreshcreated'];
         $this->dtmrefreshexpires = $db_fields['dtmrefreshexpires'];
+        $this->previousaccesstoken = $db_fields['previousaccesstoken'];
+        $this->previousrefreshtoken = $db_fields['previousrefreshtoken'];
     }
  }

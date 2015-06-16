@@ -120,16 +120,35 @@ class AccessManagerAPI
 	 * Exception codes are:
 	 * 			1 = invalid token
 	 * 			2 = expired token
+	 * 			3 = new token generated
 	 */
 	 public static function isAuthorized($accessToken) {
 	 	$authorization = Authorization::loadByAccessToken($accessToken);
 		if ($authorization == false) {
-			throw new Exception\AccessDeniedException(Constants::MSG_INVALID_ACCESS_TOKEN, 1);
+
+			// If this request is using an old access token notify the caller that this 
+			// access token has been superseded.
+			$authorization = Authorization::loadByPreviousAccessToken($accessToken);
+			if ($authorization != false) {
+				throw new Exception\AccessDeniedException(
+						Constants::MSG_NEW_TOKEN_GENERATED,
+						7);
+			} else {
+				throw new Exception\AccessDeniedException(Constants::MSG_INVALID_ACCESS_TOKEN, 1);
+			}
 		}
 		
 		$currTime = time();
 		if ($currTime > $authorization->dtmaccessexpires) {
 			throw new Exception\AccessDeniedException(Constants::MSG_EXPIRED_ACCESS_TOKEN, 2);
+		}
+		
+		// If the previous access token is set, clear it. This constitutes the acknowledgement that the
+		// new token was successfully received by the client.
+		if ($authorization->previousaccesstoken != null) {
+			$authorization->previousaccesstoken = null;
+			$authorization->previousrefreshtoken = null;
+			$authorization->save();
 		}
 		
 		// TODO: At a future iteration we will also check access scopes
@@ -162,9 +181,24 @@ class AccessManagerAPI
 		
 	 	$authorization = Authorization::loadByAccessToken($accessToken);
 		if ($authorization == false) {
-			throw new Exception\AccessDeniedException(
-					Constants::MSG_INVALID_ACCESS_TOKEN,
-					1);
+
+			$authorization = Authorization::loadByPreviousAccessToken($accessToken);
+			if ($authorization == false) {
+				throw new Exception\AccessDeniedException(
+						Constants::MSG_INVALID_ACCESS_TOKEN,
+						1);
+			}
+
+			// Here, the request is using an old access token. Re-send the new tokens if they
+			// have not yet expired.
+			$currTime = time();
+			if ($currTime < $authorization->dtmaccessexpires) {
+				return $authorization;
+			}
+			
+			// Access token has already expired. Replace the new refresh token with the old one and 
+			// let the code below proceed to refresh the tokens
+			$authorization->refreshtoken = $authorization->previousrefreshtoken;
 		}
 		
 		if ($authorization->refreshtoken != $refreshToken) {
@@ -199,10 +233,12 @@ class AccessManagerAPI
 		$newRefreshToken = AccessManagerAPI::generateRefreshToken($device->deviceuuid);
 		
 		// Update the authorization
+		$authorization->previousaccesstoken = $authorization->accesstoken;
 		$authorization->accesstoken = $newAccessToken['accesstoken'];
 		$authorization->dtmaccessexpires = $newAccessToken['expiretime'];
 		$authorization->dtmaccesscreated = $newAccessToken['created'];
 		
+		$authorization->previousrefreshtoken = $authorization->refreshtoken;
 		$authorization->refreshtoken = $newRefreshToken['refreshtoken'];
 		$authorization->dtmrefreshexpires = $newRefreshToken['expiretime'];
 		$authorization->dtmrefreshcreated = $newRefreshToken['created'];

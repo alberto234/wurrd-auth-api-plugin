@@ -29,7 +29,7 @@ namespace Wurrd\Mibew\Plugin\AuthAPI;
 class Constants
 {
 	// Version informatiom    
-    const WAA_VERSION 		= '0.1.0';
+    const WAA_VERSION 		= '0.1.1';
     const TOKEN_VERSION 	= '1';
 	
 	// API response messages
@@ -40,6 +40,7 @@ class Constants
 	const MSG_EXPIRED_ACCESS_TOKEN 		= 'ExpiredAccessToken';
 	const MSG_INVALID_REFRESH_TOKEN 	= 'InvalidRefreshToken';
 	const MSG_EXPIRED_REFRESH_TOKEN 	= 'ExpiredRefreshToken';
+	const MSG_NEW_TOKEN_GENERATED 		= 'NewTokenGenerated';
 	const MSG_INVALID_OPERATOR			= 'InvalidOperator';
 	const MSG_INVALID_DEVICE			= 'InvalidDevice';
 	const MSG_INVALID_JSON				= 'InvalidJSON';

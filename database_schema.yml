@@ -41,5 +41,8 @@ waa_authorization:
         dtmrefreshcreated: "int NOT NULL"
         # When the refresh token expires.
         dtmrefreshexpires: "int NOT NULL"
+        # Previous access and refresh tokens (used in case client didn't receive newly minted tokens)
+        previousaccesstoken: "varchar(256)"
+        previousrefreshtoken: "varchar(256)"
         # TODO: How do we capture scope?
 

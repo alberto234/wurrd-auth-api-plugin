@@ -1,6 +1,6 @@
 {
     "name": "wurrd-auth-api-plugin",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "A plugin for Mibew that provides APIs for authentication.",
     "private": true,
     "bugs": {

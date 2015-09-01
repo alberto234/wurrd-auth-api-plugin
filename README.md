@@ -18,7 +18,7 @@ A state diagram can be found in [docs/Wurrd_Authorization_API_State_Diagram.pdf]
 
 ## Installation
 
-1. Get the built archive for this plugin from [here](http://wurrd.scalior.com/get-it-now).
+1. Get the built archive for this plugin from [here](http://wurrd.scalior.com/get-it-now/#wurrd_downloads).
 
 2. Untar/unzip the plugin's archive.
 

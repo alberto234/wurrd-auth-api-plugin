@@ -32,7 +32,7 @@ gulp.task('default', ['prepare-release'], function() {
  */
 var getSources = function() {
     return gulp.src([
-            'constants.php',
+            'Constants.php',
             'database_schema.yml',
             'routing.yml',
             'Plugin.php',

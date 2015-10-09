@@ -30,6 +30,7 @@ A state diagram can be found in [docs/Wurrd_Authorization_API_State_Diagram.pdf]
         "Wurrd:AuthAPI": # Plugin's configurations are described below
      		client_id: TEST_CLIENT_ID
    ```
+Note: The configuration hierarchy is built through by parsing the indentation of the config.yml file, so the number of spaces before each line matters. See [issue 2](https://github.com/alberto234/wurrd-auth-api-plugin/issues/2) for symptoms of a bad config.yml file.
 
 5. Navigate to "`<Mibew Base URL>`/operator/plugin" page and enable the plugin.
 

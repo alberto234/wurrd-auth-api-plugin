@@ -1,6 +1,9 @@
 # Auth API plugin for Mibew by Wurrd
 
-This plugin provides authentication APIs for Mibew. There are currently two APIs for authentication:
+This plugin provides authentication APIs for Mibew, and it is loosely based on OAuth2, specifically the Client Credentials (and Refresh Token) grant type. The ultimate goal will be for this plugin to strictly adhere to OAuth2, even if this means utilizing an OAuth2 library for PHP under the hood if that is what makes more sense. 
+
+There are currently two APIs for authentication:
+
 1. An HTTP API for external applications
 2. A PHP API that is exposed for use by other plugins
 
@@ -19,11 +22,8 @@ A state diagram can be found in [docs/Wurrd_Authorization_API_State_Diagram.pdf]
 ## Installation
 
 1. Get the built archive for this plugin from [here](http://wurrd.scalior.com/get-it-now).
-
 2. Untar/unzip the plugin's archive.
-
 3. Put files of the plugins to the `<Mibew root>/plugins`  folder.
-
 4. Add plugins configs to "plugins" structure in "`<Mibew root>`/configs/config.yml". If the "plugins" stucture looks like `plugins: []` it will become:
     ```yaml
     plugins:

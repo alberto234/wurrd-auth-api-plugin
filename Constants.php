@@ -29,7 +29,7 @@ namespace Wurrd\Mibew\Plugin\AuthAPI;
 class Constants
 {
 	// Version informatiom    
-    const WAA_VERSION 		= '0.1.1';
+    const WAA_VERSION 		= '0.1.2';
     const TOKEN_VERSION 	= '1';
 	
 	// API response messages
@@ -59,7 +59,7 @@ class Constants
 	// Defaults for authorization.
 	// These could be provided as plugin configurations
 	const ACCESS_DURATION	 	= 3600;			// One hour
-	const REFRESH_DURATION 	= 604800;		// One week
+	const REFRESH_DURATION 		= 2592000;		// 30 days
 	
     /**
      * This class should not be instantiated

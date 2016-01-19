@@ -48,14 +48,12 @@ class Plugin extends AbstractPlugin implements PluginInterface
      * @param array $config List of the plugin config. The following options are
      * supported:
      *   - 'client_id': string, an id that the client will present to get an
-	 * 					authorization token. It is required.
+	 * 					authorization token. It is required. 
+	 * 					*** THIS IS NOT REQUIRED AS FROM version 0.1.3
      */
     public function __construct($config)
     {
-    	if (isset($config['client_id'])) {
-	        $this->config = $config;
-    		$this->initialized = true;
-		}
+    	$this->initialized = true;
     }
 
     /**
@@ -107,4 +105,16 @@ class Plugin extends AbstractPlugin implements PluginInterface
     	$installer = new WurrdInstaller(load_system_configs());
     	return  $installer->dropTables();
     }
+
+    /**
+     * Performs all database updates needed for 0.1.3.
+     *
+     * @return boolean True if the updates have been applied successfully and
+     * false otherwise.
+     */
+    public static function update00103()
+    {
+    	$installer = new WurrdInstaller(load_system_configs());
+		return $installer->update00103();
+	}
 }

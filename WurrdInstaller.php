@@ -104,6 +104,51 @@ class WurrdInstaller extends Installer
     }
 
     /**
+     * Performs all database updates needed for 0.1.3.
+     *
+     * @return boolean True if the updates have been applied successfully and
+     * false otherwise.
+     */
+    public function update00103()
+    {
+        $db = $this->getDatabase();
+
+        if (!$db) {
+            return false;
+        }
+
+        $db->query('START TRANSACTION');
+        try {
+            // Alter device table.
+            $db->query('ALTER TABLE {waa_device} ADD COLUMN dtmcreated int NOT NULL DEFAULT 0');
+            $db->query('ALTER TABLE {waa_device} ADD COLUMN dtmmodified int NOT NULL DEFAULT 0');
+            $db->query('ALTER TABLE {waa_device} ADD INDEX idx_device (deviceuuid, platform)');
+			
+            // Alter authorization table.
+            $db->query('ALTER TABLE {waa_authorization} ADD COLUMN dtmcreated int NOT NULL DEFAULT 0 AFTER clientid');
+            $db->query('ALTER TABLE {waa_authorization} ADD COLUMN dtmmodified int NOT NULL DEFAULT 0 AFTER dtmcreated');
+            $db->query('ALTER TABLE {waa_authorization} ADD INDEX idx_accesstoken (accesstoken)');
+            $db->query('ALTER TABLE {waa_authorization} ADD INDEX idx_refreshtoken (refreshtoken)');
+            $db->query('ALTER TABLE {waa_authorization} ADD INDEX idx_deviceid (deviceid)');
+            $db->query('ALTER TABLE {waa_authorization} ADD INDEX idx_previousaccesstoken (previousaccesstoken)');
+			
+        } catch (\Exception $e) {
+            // Something went wrong. We actually cannot update the database.
+            $this->errors[] = getlocal('Cannot update content: {0}', $e->getMessage());
+            // The database changes should be discarded.
+            $db->query('ROLLBACK');
+
+            return false;
+        }
+
+        // All needed data has been updated.
+        $db->query('COMMIT');
+
+        return true;
+    }
+	
+	
+    /**
      * Loads database schema.
      *
      * @return array Associative array of database schema. Each key of the array

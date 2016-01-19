@@ -117,6 +117,18 @@ class Authorization
     public $previousrefreshtoken;
 	
     /**
+     * Unix timestamp of the moment this record was created.
+     * @var int
+     */
+    public $created;
+
+    /**
+     * Unix timestamp of the moment this record was modified.
+     * @var int
+     */
+    public $modified;
+
+    /**
      * Loads authorization by its ID.
      *
      * @param int $id ID of the authorization to load
@@ -246,6 +258,7 @@ class Authorization
     public static function createNewAuhtorization($accessToken, $accessExpire, $accessCreated,
     	$refreshToken, $refreshExpire, $refreshCreated, $operatorid, $deviceid, $clientid)
     {
+		$now = time();
     	$db_fields = array('authid' => false,
     					   'operatorid' => (int)$operatorid,
     					   'deviceid' => (int)$deviceid,
@@ -258,6 +271,8 @@ class Authorization
     					   'dtmrefreshexpires' => $refreshExpire,
     					   'previousaccesstoken' => null,
     					   'previousrefreshtoken' => null,
+						   'dtmcreated' => $now,
+						   'dtmmodified' => $now,
     				);
 
         // Create and populate authorization object
@@ -305,10 +320,10 @@ class Authorization
             $db->query(
                 ("INSERT INTO {waa_authorization} (operatorid, deviceid, clientid, accesstoken, "
 					. "dtmaccesscreated, dtmaccessexpires, refreshtoken, dtmrefreshcreated, dtmrefreshexpires, "
-					. "previousaccesstoken, previousrefreshtoken) "
+					. "previousaccesstoken, previousrefreshtoken, dtmcreated, dtmmodified) "
                     . "VALUES (:operatorid, :deviceid, :clientid, :accesstoken, :dtmaccesscreated, "
 					. ":dtmaccessexpires, :refreshtoken, :dtmrefreshcreated, :dtmrefreshexpires, "
-					. ":previousaccesstoken, :previousrefreshtoken)"),
+					. ":previousaccesstoken, :previousrefreshtoken, :dtmcreated, :dtmmodified)"),
                 array(
                     ':operatorid' => (int)$this->operatorid,
                     ':deviceid' => (int)$this->deviceid,
@@ -321,17 +336,20 @@ class Authorization
                     ':dtmrefreshexpires' => $this->dtmrefreshexpires,
                     ':previousaccesstoken' => $this->previousaccesstoken,
                     ':previousrefreshtoken' => $this->previousrefreshtoken,
+                    ':dtmcreated' => $this->created,
+                    ':dtmmodified' => $this->modified,
                 )
             );
             $this->id = $db->insertedId();
 
         } else {
             // Update existing authorization
+ 			$this->modified = time();
             $db->query(
                 ("UPDATE {waa_authorization} SET accesstoken = :accesstoken, dtmaccesscreated = :dtmaccesscreated, "
                     . "dtmaccessexpires = :dtmaccessexpires, refreshtoken = :refreshtoken, "
                     . "dtmrefreshcreated = :dtmrefreshcreated, dtmrefreshexpires = :dtmrefreshexpires, "
-                    . "previousaccesstoken = :previousaccesstoken, previousrefreshtoken = :previousrefreshtoken "
+                    . "previousaccesstoken = :previousaccesstoken, previousrefreshtoken = :previousrefreshtoken, dtmmodified = :dtmmodified "
                     . "WHERE authid = :id"),
                 array(
                     ':id' => $this->id,
@@ -343,6 +361,7 @@ class Authorization
                     ':dtmrefreshexpires' => $this->dtmrefreshexpires,
                     ':previousaccesstoken' => $this->previousaccesstoken,
                     ':previousrefreshtoken' => $this->previousrefreshtoken,
+                    ':dtmmodified' => $this->modified,
                 )
             );
         }
@@ -368,5 +387,7 @@ class Authorization
         $this->dtmrefreshexpires = $db_fields['dtmrefreshexpires'];
         $this->previousaccesstoken = $db_fields['previousaccesstoken'];
         $this->previousrefreshtoken = $db_fields['previousrefreshtoken'];
+		$this->created = $db_fields['dtmcreated'];
+		$this->modified = $db_fields['dtmmodified'];
     }
  }

@@ -80,6 +80,19 @@ class Device
      * @var string
      */
     public $osVersion;
+	
+    /**
+     * Unix timestamp of the moment this record was created.
+     * @var int
+     */
+    public $created;
+
+    /**
+     * Unix timestamp of the moment this record was modified.
+     * @var int
+     */
+    public $modified;
+
 
     /**
      * Loads device by its ID.
@@ -164,13 +177,17 @@ class Device
             return false;
         }
 
+		$now = time();
         $device_info = array('deviceid' => false,
         					 'deviceuuid' => $uuid,
         					 'platform' => $platform,
         					 'type' => $type,
         					 'name' => $name,
 							 'os' => $os,
-							 'osversion' => $osVersion);
+							 'osversion' => $osVersion,
+							 'dtmcreated' => $now,
+							 'dtmmodified' => $now,
+							 );
 							 
         // Create and populate device object
         $device = new self();
@@ -178,37 +195,6 @@ class Device
 
         return $device;
     }
-
-    /**
-     * Loads all bans.
-     *
-     * @return array List of Ban instances.
-     *
-     * @throws \RuntimeException If something went wrong and the list could not
-     *   be loaded.
-     */
-     /* We don't need this
-    public static function all()
-    {
-        $rows = Database::getInstance()->query(
-            "SELECT * FROM {ban}",
-            null,
-            array('return_rows' => Database::RETURN_ALL_ROWS)
-        );
-
-        if ($rows === false) {
-            throw new \RuntimeException('Bans list cannot be retrieved.');
-        }
-
-        $bans = array();
-        foreach ($rows as $item) {
-            $ban = new self();
-            $ban->populateFromDbFields($item);
-            $bans[] = $ban;
-        }
-
-        return $bans;
-    }*/
 
     /**
      * Class constructor.
@@ -246,8 +232,8 @@ class Device
         if (!$this->id) {
             // This device is new.
             $db->query(
-                ("INSERT INTO {waa_device} (deviceuuid, platform, type, name, os, osversion) "
-                    . "VALUES (:uuid, :platform, :type, :name, :os, :osversion)"),
+                ("INSERT INTO {waa_device} (deviceuuid, platform, type, name, os, osversion, dtmcreated, dtmmodified) "
+                    . "VALUES (:uuid, :platform, :type, :name, :os, :osversion, :dtmcreated, :dtmmodified)"),
                 array(
                     ':uuid' => $this->deviceuuid,
                     ':platform' => $this->platform,
@@ -255,26 +241,29 @@ class Device
                     ':name' => $this->name,
                     ':os' => $this->os,
                     ':osversion' => $this->osVersion,
+                    ':dtmcreated' => $this->created,
+                    ':dtmmodified' => $this->modified,
+                                        
                 )
             );
             $this->id = $db->insertedId();
 
         } else {
-        	// Question: Does an update make sense for a device? Probably not
+        	// Question: Does an update make sense for a device?
+        	// Yes it does. We can modify the OS and the OS version.
+        	// This has not yet been implemented
  
- 			/*
+ 			$this->modified = time();
             // Update existing device
             $db->query(
-                ("UPDATE {waa_device} SET deviceuuid = :uuid, platform = :platform, "
-                    . "type = :type, name = :name WHERE deviceid = :id"),
+                ("UPDATE {waa_device} SET os = :os, osversion = :osversion, "
+                    . "dtmmodified = :dtmmodified"),
                 array(
-                    ':id' => $this->id,
-                    ':uuid' => $this->deviceuuid,
-                    ':platform' => $this->platform,
-                    ':name' => $this->name
+                    ':os' => $this->os,
+                    ':osversion' => $this->osVersion,
+                    ':dtmmodified' => $this->modified,
                 )
             );
-			*/
         }
     }
 
@@ -293,5 +282,7 @@ class Device
         $this->name = $db_fields['name'];
 		$this->os = $db_fields['os'];
 		$this->osVersion = $db_fields['osversion'];
+		$this->created = $db_fields['dtmcreated'];
+		$this->modified = $db_fields['dtmmodified'];
     }
 }

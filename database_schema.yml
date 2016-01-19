@@ -18,7 +18,13 @@ waa_device:
         os: "varchar(64)"
         # Device operating system version
         osversion: "varchar(32)"
-        
+        # Unix timestamp of the moment when this record was created.
+        dtmcreated: "int NOT NULL DEFAULT 0"
+        # Unix timestamp of the moment when this record was last modified.
+        dtmmodified: "int NOT NULL DEFAULT 0"
+    indexes:
+        idx_device: [deviceuuid, platform]
+
 # Contains information about authorizations
 waa_authorization:
     fields:
@@ -29,6 +35,10 @@ waa_authorization:
         deviceid: "int NOT NULL"
         # ID of the client application that requested the authorization
         clientid: "varchar(256)"
+        # Unix timestamp of the moment when this record was created.
+        dtmcreated: "int NOT NULL DEFAULT 0"
+        # Unix timestamp of the moment when this record was last modified.
+        dtmmodified: "int NOT NULL DEFAULT 0"
         # access token
         accesstoken: "varchar(256) NOT NULL"
         # Unix timestamp of the moment when the access token was created.
@@ -45,4 +55,9 @@ waa_authorization:
         previousaccesstoken: "varchar(256)"
         previousrefreshtoken: "varchar(256)"
         # TODO: How do we capture scope?
+    indexes:
+        idx_accesstoken: [accesstoken]
+        idx_refreshtoken: [refreshtoken]
+        idx_deviceid: [deviceid]
+        idx_previousaccesstoken: [previousaccesstoken]
 

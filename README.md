@@ -21,7 +21,7 @@ A state diagram can be found in [docs/Wurrd_Authorization_API_State_Diagram.pdf]
 
 ## Installation
 
-1. Get the built archive for this plugin from [here](http://wurrd.scalior.com/get-it-now).
+1. Get the built archive for this plugin from [here](http://wurrdapp.com/get-it-now).
 2. Untar/unzip the plugin's archive.
 3. Put files of the plugins to the `<Mibew root>/plugins`  folder.
 4. Add plugins configs to "plugins" structure in "`<Mibew root>`/configs/config.yml". If the "plugins" stucture looks like `plugins: []` it will become:

@@ -179,6 +179,7 @@ class AccessManagerAPI
 		//		 If the client doesn't access the system within that duration, they 
 		//		 will need to login again. REFRESH_DURATION can be made configurable
 		
+		$currTime = time();
 	 	$authorization = Authorization::loadByAccessToken($accessToken);
 		if ($authorization == false) {
 
@@ -191,7 +192,6 @@ class AccessManagerAPI
 
 			// Here, the request is using an old access token. Re-send the new tokens if they
 			// have not yet expired.
-			$currTime = time();
 			if ($currTime < $authorization->dtmaccessexpires) {
 				return $authorization;
 			}
@@ -211,6 +211,12 @@ class AccessManagerAPI
 					4);
 		}
 				
+				
+		// This mitigates race conditions from the client.
+		if (($currTime - $authorization->dtmaccesscreated) <= Constants::MIN_REFRESH_INTERVAL) {
+			return $authorization;
+		}
+
 		$operator = operator_by_id($authorization->operatorid);
 		if ($operator == null) {
 			throw new Exception\HttpException(

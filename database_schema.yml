@@ -23,7 +23,7 @@ waa_device:
         # Unix timestamp of the moment when this record was last modified.
         dtmmodified: "int NOT NULL DEFAULT 0"
     indexes:
-        idx_device: [deviceuuid, platform]
+        idx_device: [deviceuuid(256), platform]
 
 # Contains information about authorizations
 waa_authorization:

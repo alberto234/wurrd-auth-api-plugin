@@ -29,7 +29,7 @@ namespace Wurrd\Mibew\Plugin\AuthAPI;
 class Constants
 {
 	// Version informatiom    
-    const WAA_VERSION 		= '0.1.4';
+    const WAA_VERSION 		= '0.1.5';
     const TOKEN_VERSION 	= '1';
 	
 	// API response messages
